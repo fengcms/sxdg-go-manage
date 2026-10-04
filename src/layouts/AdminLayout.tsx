@@ -1,7 +1,34 @@
 // 响应式导航与身份校准，菜单只展示当前角色授权页面。
 
 import { useQuery } from "@tanstack/react-query";
-import { ChevronRight, Layers, LayoutDashboard, LogOut, Menu } from "lucide-react";
+import {
+  Award,
+  Briefcase,
+  ChartColumn,
+  ChevronRight,
+  ClipboardList,
+  FileJson,
+  FolderTree,
+  Headphones,
+  Image,
+  Layers,
+  LogOut,
+  Menu,
+  MessagesSquare,
+  Moon,
+  PanelLeft,
+  Percent,
+  RotateCcw,
+  ScrollText,
+  Settings,
+  ShieldCheck,
+  ShoppingBag,
+  Star,
+  Sun,
+  Tags,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -12,8 +39,34 @@ import { allowed, roles } from "../lib/permission";
 import { qk, queryClient } from "../lib/queryClient";
 import { clearSession, request } from "../lib/request/core";
 import { useAuth } from "../store/auth";
+import { usePreferences } from "../store/preferences";
 import type { UserIdentity } from "../types/common";
+
+const navIcons = [
+  ChartColumn,
+  ChartColumn,
+  Users,
+  Wallet,
+  Users,
+  ShieldCheck,
+  FolderTree,
+  Star,
+  FileJson,
+  Image,
+  Tags,
+  ShoppingBag,
+  RotateCcw,
+  Briefcase,
+  ClipboardList,
+  Headphones,
+  MessagesSquare,
+  Settings,
+  Award,
+  Percent,
+  ScrollText,
+];
 export default function AdminLayout() {
+  const { theme, collapsed, toggleTheme, toggleSidebar } = usePreferences();
   const user = useAuth((s) => s.user);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -41,7 +94,7 @@ export default function AdminLayout() {
   const items = navigation.filter((n) => allowed(user?.adminRole, n.roles));
   const title = navigationFor(location.pathname)?.title || "工作台";
   return (
-    <div className="app-bg admin-shell">
+    <div className={`app-bg admin-shell ${collapsed ? "is-collapsed" : ""}`}>
       {open && (
         <button
           type="button"
@@ -67,18 +120,22 @@ export default function AdminLayout() {
                   <NavLink
                     end={n.path === "/users"}
                     title={n.title}
+                    aria-label={n.title}
                     onClick={() => setOpen(false)}
                     key={n.path}
                     to={n.path}
                   >
-                    <LayoutDashboard size={17} />
+                    {(() => {
+                      const Icon = navIcons[navigation.indexOf(n)] || Settings;
+                      return <Icon size={16} aria-hidden="true" />;
+                    })()}
                     <span>{n.title}</span>
                   </NavLink>
                 ))}
             </div>
           ))}
         </nav>
-        <div className="sidebar-footer">本地联调 · 外部服务 Mock</div>
+        <div className="sidebar-footer">{import.meta.env.DEV ? "开发环境" : "管理控制台"}</div>
       </aside>
       <div className="main-shell">
         <header className="topbar">
@@ -91,12 +148,27 @@ export default function AdminLayout() {
             >
               <Menu size={20} />
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="collapse-button"
+              aria-label={collapsed ? "展开侧边栏" : "折叠侧边栏"}
+              onClick={toggleSidebar}
+            >
+              <PanelLeft size={18} />
+            </Button>
             <span className="hint">工作台</span>
             <ChevronRight size={14} />
             <span>{title}</span>
           </div>
           <div className="actions">
-            <span>{user?.nickname}</span>
+            <Button variant="ghost" size="icon" aria-label="切换主题" onClick={toggleTheme}>
+              {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+            </Button>
+            <span className="avatar" aria-hidden="true">
+              {user?.nickname?.slice(0, 1) || "管"}
+            </span>
+            <span className="account-name">{user?.nickname}</span>
             <span className="badge">
               {roles[user?.adminRole as keyof typeof roles] || "未知角色"}
             </span>
