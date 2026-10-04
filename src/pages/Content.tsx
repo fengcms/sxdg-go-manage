@@ -9,9 +9,11 @@ import { adminPath, allPages } from "../api/admin";
 import { ResourceList } from "../components/data/ResourceList";
 import { ActionDialog, type ActionSpec, type FieldSpec } from "../components/feedback/ActionDialog";
 import { Button } from "../components/ui";
+import { actions, allowed } from "../lib/permission";
 import { qk } from "../lib/queryClient";
 import { parseTemplate } from "../lib/template";
 import { text } from "../lib/utils";
+import { useAuth } from "../store/auth";
 export interface Category {
   id: number;
   parentId: number | null;
@@ -70,6 +72,8 @@ export function categoryPath(row: Category, rows: Category[]) {
 export default function Content() {
   const { kind = "categories" } = useParams();
   const navigate = useNavigate();
+  const role = useAuth((s) => s.user?.adminRole);
+  const readOnly = kind === "form-templates" && !allowed(role, actions.content);
   const [action, setAction] = useState<ActionSpec | null>(null);
   const cats = useQuery({
     queryKey: qk.resource("all-categories"),
@@ -242,7 +246,7 @@ export default function Content() {
               : "维护小程序展示内容"
         }
         actions={
-          <Button disabled={cats.isLoading || cats.isError} onClick={() => edit()}>
+          <Button disabled={readOnly || cats.isLoading || cats.isError} onClick={() => edit()}>
             新建{titles[kind]}
           </Button>
         }
@@ -305,9 +309,9 @@ export default function Content() {
                   disabled={cats.isLoading || cats.isError}
                   onClick={() => edit(r)}
                 >
-                  编辑
+                  {readOnly ? "查看" : "编辑"}
                 </Button>
-                {kind === "form-templates" && (
+                {kind === "form-templates" && !readOnly && (
                   <Button
                     variant="ghost"
                     onClick={() =>
@@ -315,7 +319,17 @@ export default function Content() {
                         title: "克隆模板",
                         path: adminPath(`${kind}/${r.id}/clone`),
                         method: "POST",
-                        body: {},
+                        fields: [
+                          {
+                            key: "templateName",
+                            label: "新模板名称",
+                            required: true,
+                            default: `${r.templateName} 副本`,
+                          },
+                        ],
+                        validate: (v): Record<string, string> =>
+                          [...v.templateName].length > 64 ? { templateName: "名称最多64字" } : {},
+                        build: (v) => ({ templateName: v.templateName }),
                       })
                     }
                   >
@@ -324,6 +338,7 @@ export default function Content() {
                 )}
                 <Button
                   variant="danger-ghost"
+                  disabled={readOnly}
                   onClick={() =>
                     setAction({
                       title: kind === "featured-categories" ? "删除热门入口" : "停用 / 删除",

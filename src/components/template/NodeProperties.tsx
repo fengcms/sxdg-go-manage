@@ -2,6 +2,7 @@
 import type { EditorNode, NodeKind } from "../../lib/templateEditor";
 import { FormField } from "../form/FormField";
 import { Button, Input, Select } from "../ui";
+import { OptionListEditor } from "./OptionListEditor";
 export const NodeProperties = ({
   node,
   readOnly,
@@ -9,6 +10,9 @@ export const NodeProperties = ({
   onData,
   onAdd,
   onDelete,
+  onOptionChange,
+  onOptionMove,
+  onOptionDelete,
 }: {
   node: EditorNode;
   readOnly: boolean;
@@ -16,6 +20,9 @@ export const NodeProperties = ({
   onData: (data: Record<string, unknown>, reset?: boolean) => void;
   onAdd: (key: string, kind: NodeKind) => void;
   onDelete: () => void;
+  onOptionChange: (id: string, data: Record<string, unknown>) => void;
+  onOptionMove: (id: string, offset: number) => void;
+  onOptionDelete: (id: string) => void;
 }) => {
   const set = (key: string, value: unknown) => onData({ ...node.data, [key]: value });
   const text = (key: string, label: string) => (
@@ -128,6 +135,15 @@ export const NodeProperties = ({
           />
           预览禁用（展示属性）
         </label>
+      )}
+      {node.children.options && (
+        <OptionListEditor
+          nodes={node.children.options}
+          readOnly={readOnly}
+          onChange={onOptionChange}
+          onMove={onOptionMove}
+          onDelete={onOptionDelete}
+        />
       )}
       {!readOnly && (
         <div className="designer-add">

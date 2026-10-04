@@ -1281,3 +1281,14 @@ pre {
   white-space: pre-wrap;
   font-size: 12px;
 }
+.designer-option-list {
+  display: grid;
+  gap: 12px;
+}
+.designer-option-row {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+}

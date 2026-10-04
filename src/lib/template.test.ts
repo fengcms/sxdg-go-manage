@@ -131,3 +131,17 @@ it("重复局部滚轮和选项拒绝并提供结构路径", () => {
   ];
   expect(() => parseTemplate(JSON.stringify(data))).toThrow("wheels");
 });
+it("嵌套深度根面板为0，边界16可导入且17拒绝", () => {
+  let p: Record<string, unknown> = { mode: "chips", options: [{ value: "a", label: "a" }] };
+  const wrap = () => {
+    p = { mode: "tab", groups: [{ key: "g", label: "分组", panel: p }] };
+  };
+  for (let i = 0; i < 16; i++) wrap();
+  const raw = () =>
+    JSON.stringify([
+      { blockId: "b", fields: [{ key: "f", label: "f", type: "drawer", panel: p }] },
+    ]);
+  expect(() => parseTemplate(raw())).not.toThrow();
+  wrap();
+  expect(() => parseTemplate(raw())).toThrow("深度");
+});

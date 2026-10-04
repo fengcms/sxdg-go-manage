@@ -1,6 +1,6 @@
 // 模板设计工作区保存完整DSL；预览值独立，服务端版本为权威。
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useBeforeUnload, useBlocker, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { adminPath, allPages } from "../api/admin";
@@ -75,6 +75,7 @@ const Workspace = ({ initial }: { initial: Template }) => {
   );
   const [selected, setSelected] = useState("");
   const [baseline, setBaseline] = useState(stableJSON(initial));
+  const [savedID, setSavedID] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [jsonMode, setJsonMode] = useState(false);
@@ -88,6 +89,12 @@ const Workspace = ({ initial }: { initial: Template }) => {
   const raw = JSON.stringify(draft.blocks, null, 2);
   const dirty = stableJSON(draft) !== baseline;
   const blocker = useBlocker(dirty);
+  useEffect(() => {
+    if (savedID && !dirty) {
+      navigate(`/content/form-templates/${savedID}`, { replace: true });
+      setSavedID(0);
+    }
+  }, [savedID, dirty, navigate]);
   useBeforeUnload((event) => {
     if (dirty) {
       event.preventDefault();
@@ -142,6 +149,7 @@ const Workspace = ({ initial }: { initial: Template }) => {
           },
         },
       );
+      if (!meta.id) setSavedID(result.id);
       setMeta(result);
       setNodes(editorNodes(parseTemplate(JSON.stringify(result.blocks)).blocks));
       setSelected("");
@@ -296,7 +304,7 @@ const Workspace = ({ initial }: { initial: Template }) => {
               复制JSON
             </Button>
             {!readOnly && (
-              <Button variant="outline" onClick={() => setImporting(true)}>
+              <Button variant="outline" disabled={saving} onClick={() => setImporting(true)}>
                 从JSON导入
               </Button>
             )}
@@ -340,6 +348,11 @@ const Workspace = ({ initial }: { initial: Template }) => {
                 node={node}
                 nestedPanel={node.kind === "panel" && panelDepth(nodes, node.id) > 0}
                 readOnly={readOnly || saving}
+                onOptionChange={(id, data) =>
+                  setNodes(editNode(nodes, id, (n) => ({ ...n, data })))
+                }
+                onOptionMove={(id, offset) => setNodes(moveNode(nodes, id, offset))}
+                onOptionDelete={(id) => setNodes(removeNode(nodes, id))}
                 onData={changeData}
                 onAdd={add}
                 onDelete={() => {
