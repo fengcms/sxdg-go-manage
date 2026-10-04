@@ -1,9 +1,9 @@
 # 前后端接口对接清单（合同版）
 
-> 状态：v2（按 [review/01-pre-development-review.md](./review/01-pre-development-review.md) R03/R04/R13 修正，以 sxdg-be 实际代码为准）
+> 状态：v3（按 [review/04-second-round-decisions.md](./review/04-second-round-decisions.md) S01/S02/S04/S08/S09 裁决同步修订：命名约定改「逐接口 DTO 为准」、表单模板 DSL 修正、客服 cs/me 契约与阅读权、看板口径、服务费精度冻结）
 > 日期：2026-10-04
 > 权威性：本文是管理后台前端对接的**唯一合同**。与《管理后台前端技术栈与UI风格指导.md》冲突时，以本文为准。
-> 后端待补接口见 [sxdg-be/docs/review/admin-backend-supplement-tasks.md](../../sxdg-be/docs/review/admin-backend-supplement-tasks.md)（标注 ⏳ 的接口）。
+> 后端待补接口见 [sxdg-be/docs/review/admin-backend-supplement-tasks.md](../../../sxdg-be/docs/review/admin-backend-supplement-tasks.md)（标注 ⏳ 的接口）。
 
 ---
 
@@ -24,11 +24,14 @@
 - 响应结构：`{ "items": [...], "total": N, "page": N, "pageSize": N }`（camelCase，与后端 `Page.Result` 一致）
 - 前端 UI 若偏好其他形状，仅在 API adapter 层显式转换，禁止全局猜测命名转换
 
-### 0.3 命名约定
+### 0.3 命名约定（S01 修订：逐接口 DTO 为准）
 
-- 常规模型 JSON 为 **camelCase**
-- **唯一已知例外**：`fee-config` 接口使用 snake_case（`fee_rate` / `min_fee` / `split_ratio`），单列注明，不做自动转换
-- 数据库字段为 snake_case，但不出现在 JSON 传输中
+- **命名以各接口真实序列化 DTO 为准**：常规模型 JSON 为 **camelCase**（如用户 `avatarUrl` / `isEmployer` / `creditScore`，分类构树键 `parentId`）
+- **已知例外清单**（不适用 camelCase，按各自真实键读取）：
+  - **看板**：`service_gmv` / `active_users` / `new_users` / `available_balance` / `frozen_balance`（snake_case）
+  - **fee-config**：`fee_rate` / `min_fee` / `split_ratio`（snake_case）
+  - **订单快照内部协议**（`addressSnapshot` 等 JSONb 内部结构按其内部协议，非全局 camelCase）
+- **禁止全局自动命名转换**（不做 snake_case ⇄ camelCase 的自动互转）；例外接口在各自模块单列注明，前端按逐接口定义读取
 
 ### 0.4 金额与日期
 
@@ -90,12 +93,13 @@
 
 | 方法 | 路径 | 响应数组元素字段（真实口径） |
 |------|------|------------------------------|
-| GET | `/api/v1/admin/dashboard/overview` | `users`（用户总数）、`orders`（订单总数）、`service_gmv`（**已支付订单金额合计**，非已完成）、`active_users`（**最近 24 小时登录数**，非自然日 DAU） |
+| GET | `/api/v1/admin/dashboard/overview` | `users`（用户总数）、`orders`（订单总数）、`service_gmv`（**已支付订单金额合计**，非已完成）、`active_users`（**按已记录 `last_login_at` 统计的近 24 小时登录用户数**——用户行数，非登录次数；非自然日 DAU；**密码登录暂不计入**，后端任务 #10 修复后覆盖） |
 | GET | `/api/v1/admin/dashboard/orders` | `status`、`count`、`amount`（按状态分组） |
-| GET | `/api/v1/admin/dashboard/users` | `date`、`new_users`、`active_users`（按注册日期分组） |
+| GET | `/api/v1/admin/dashboard/users` | `date`、`new_users`、`active_users`（按注册日期分组；`active_users` = **该注册日期用户群中的近期活跃人数**，**每组 `active_users` ≤ `new_users`**） |
 | GET | `/api/v1/admin/dashboard/finance` | `settled`、`fees`、`refunded`、`withdrawn`、`available_balance`、`frozen_balance` |
 
 > 四个接口均返回**数组**，不接受日期/来源筛选。趋势图、日期筛选、自然日口径为二期（后端任务单 #2）。前端禁止将缺失指标补 0。
+> **S08 口径补充**：`active_users` 统计的是 `last_login_at` 落在近 24h 的**用户行数**（同一用户多次登录不重复计数）；users 序列的 `active_users` 是注册日期分组内的活跃人数（≤ 该组 `new_users`），**不能当全平台 DAU 趋势使用**。密码登录当前不更新 `last_login_at`（⏳ 后端任务 #10 缺陷修复），修复前该指标不含密码登录用户。
 
 ---
 
@@ -114,6 +118,8 @@
 
 **首期约束**：
 - 列表筛选仅有昵称关键词；手机号/角色/封禁状态/注册时间筛选为二期（后端任务单 #3）
+- **用户响应字段为 camelCase**（`avatarUrl` / `isEmployer` / `isProvider` / `isAdmin` / `creditScore` / `createdAt`，见 modules/02 §4 示例）
+- **封禁状态依赖（S05）**：用户列表 `banned` 字段 ⏳ 后端任务 **#3a**、用户详情 `banned` 字段 ⏳ 后端任务 **#4a**（均为独立 **P0**）。字段就绪前列表/详情均无封禁状态——前端规则：**字段缺失 = 状态「未知」，封禁与解封按钮双双禁用**；`undefined ≠ false`，**禁止把未知当未封禁**；操作成功后重新拉取服务端状态，不本地翻转
 - 资质 status 为数字：`0=待审核`、`1=已通过`、`2=已拒绝`（前端映射显示）
 - 证件图片：`GET /api/v1/upload/cert/:fileId`，**鉴权 fetch + Bearer → Blob → Object URL**，用后释放；不走 JSON 信封解包器，禁止 `<img src>` 直链
 - 用户模型不返回手机号（JSON 隐藏），列表无 phone_masked 字段，首期不展示手机号
@@ -124,7 +130,7 @@
 
 | 方法 | 路径 | 请求 | 说明 |
 |------|------|------|------|
-| GET | `/api/v1/admin/categories` | Query: `page`、`page_size` | **分页平铺列表**（非树），前端拉全部分页后构树 |
+| GET | `/api/v1/admin/categories` | Query: `page`、`page_size` | **分页平铺列表**（非树），前端拉全部分页后按 **`parentId`**（camelCase）构树 |
 | POST | `/api/v1/admin/categories` | Body: 分类对象 | 创建（最多三级，名称 ≤32 字） |
 | PUT | `/api/v1/admin/categories/:id` | Body: 分类对象 | 更新 |
 | DELETE | `/api/v1/admin/categories/:id` | — | 删除（后端当前仅检查子分类，引用检查 ⏳ 任务单 #7） |
@@ -146,24 +152,41 @@
 | DELETE | `/api/v1/admin/form-templates/:id` | 软删除 |
 | POST | `/api/v1/admin/form-templates/:id/clone` | 克隆 |
 
-**模板结构（真实 DSL，与小程序共用）**：
+**模板结构（真实 DSL，与小程序共用，S02 修订）**：
 
 ```json
 {
+  "templateName": "家政服务描述模板",
+  "categoryId": 12,
   "blocks": [
     {
-      "blockId": "...",
+      "blockId": "basic-info",
       "fields": [
-        { "key": "area", "label": "房屋面积", "type": "single", "required": true }
+        {
+          "key": "area",
+          "label": "房屋面积",
+          "type": "single",
+          "required": true,
+          "options": [
+            { "value": "lt50", "label": "50㎡ 以下" },
+            { "value": "50-80", "label": "50-80㎡" },
+            { "value": "80-120", "label": "80-120㎡" },
+            { "value": "gt120", "label": "120㎡ 以上" }
+          ]
+        }
       ]
     }
   ]
 }
 ```
 
-- `type` 支持：`single` / `multi` / `tags` / `drawer` / `wheel`，及递归 `panel`
+- **`type` 合法值仅 5 种**：`single` / `multi` / `tags` / `drawer` / `wheel`。**`panel` 不是独立 type**——它是 `drawer` / `wheel` 字段的**嵌套属性**（`panel.mode`（chips/tab/wheel）/ `panel.multiple` / `panel.options` / `panel.groups` / `panel.wheels`），不存在 `type: "panel"`
+- **必填 single/multi 必含非空 `options`**（`[{value, label}]`）——无 options 的必填单选「保存得进、发布用不了」（见下）
+- 完整创建示例（含 tags/drawer/wheel 嵌套 panel 结构与对应提交值形态）见 [modules/03-content-management.md §3.3](./modules/03-content-management.md)
 - 校验规则以 `service/form.go` / `validateTemplateResource` 为准；非法结构直接被拒绝
 - 首期 JSON 编辑器 + 校验 + 预览；可视化编辑器为二期
+
+> **⚠️ 「模板保存成功 ≠ 发布表单可提交」（S02 冻结）**：保存校验（`validateTemplateResource`：名称 1~64 字、key 唯一、type 合法）**不校验 options**；发布时的表单值校验（`ValidateForm`）要求提交值 ∈ options。JSON 编辑器需**同时跑两套规则**：保存校验 + 「必填单选/多选含非空 options、drawer/wheel 含合法 panel」的表单值校验预检，后者未通过要警告「可保存但无法用于发布」。
 
 ---
 
@@ -217,22 +240,23 @@
 
 ---
 
-## 9. 客服管理（首期缩减）
+## 9. 客服管理（首期缩减，S04 修订）
 
 | 方法 | 路径 | 请求 | 说明 |
 |------|------|------|------|
-| GET | `/api/v1/admin/cs/agents` ⏳ | Query: `page`、`page_size` | 客服列表（**后端无此路由，任务单 #6**） |
+| GET | `/api/v1/admin/cs/me` ⏳ | — | **当前客服身份查询（后端任务单 #6a）**：已绑定 → 200 + `{ agentId, isOnline, displayName }`；未绑定 → 200 + `{ agent: null }`（前端引导「当前账号未绑定客服」）；角色范围 = 客服账号 + super_admin |
+| GET | `/api/v1/admin/cs/agents` ⏳ | Query: `page`、`page_size` | 客服列表（**后端无此路由，任务单 #6a**） |
 | POST | `/api/v1/admin/cs/agents` | Body: 客服配置（写 cs_agents 配置，**不设置用户 isAdmin**） | 仅 super_admin |
 | POST | `/api/v1/admin/cs/agents/:id/status` | Body: `{ isOnline }` | 切换在线状态 |
-| GET | `/api/v1/admin/cs/agents/online` ⏳ | — | 可转接目标查询（**任务单 #6**） |
-| GET | `/api/v1/admin/cs/sessions` | Query: `page`、`page_size` | 我的接待中会话 |
-| POST | `/api/v1/admin/cs/sessions/:conv_id/transfer` | Body: `{ toAgentId }` | **值为 cs_agents.id，不是 users.id** |
-| GET | `/api/v1/conversations/:id/messages` | Query: `page`、`page_size` | 历史消息（需会话参与方授权） |
+| GET | `/api/v1/admin/cs/agents/online` ⏳ | — | 可转接目标查询（**任务单 #6a**） |
+| GET | `/api/v1/admin/cs/sessions` | Query: `page`、`page_size` | 会话列表（列表管理权：super_admin 全部 / 客服本人）；**单行模型无用户昵称/头像——用户摘要（昵称/头像）⏳ #6a 会话摘要 DTO（join users），就绪前仅展示用户 ID**；**无搜索参数** |
+| POST | `/api/v1/admin/cs/sessions/:conv_id/transfer` | Body: `{ toAgentId }` | **值为 cs_agents.id，不是 users.id**；**转接权仅客服本人** |
+| GET | `/api/v1/conversations/:id/messages` | Query: `page`、`page_size` | 历史消息（**消息阅读权 = 严格会话参与方，super_admin 不例外，无全会话豁免**）；数据为**已入库消息记录**（本地 chat_messages：系统卡片 + 活动文本），完整腾讯 IM 历史随 #6b |
 
 **首期范围（冻结）**：
-- 授权模型：客服仅能访问**自己接待中**的会话，**无全用户会话豁免**
-- 做接待列表、会话流转、历史消息查看
-- IM 发送链路（腾讯 IM 签名、身份映射、订单卡片协议）为独立后端任务（任务单 #6），闭合前**不宣称聊天全流程完成**
+- **授权三分（S04）**：列表管理权（super_admin 看全部、客服看本人）/ 转接权（仅客服本人）/ 消息阅读权（**严格参与方，super_admin 不例外**）。super_admin 在列表点开非本人参与会话时，**前端不发消息读取请求**，展示「仅参与方可查看历史消息」占位
+- 做接待列表、会话流转、历史消息查看（已入库消息记录）；**无会话搜索**（服务端无参数支持）
+- IM 发送链路（腾讯 IM 签名、身份映射、订单卡片协议、普通客服消息落库与 IM 全量历史）为独立后端任务（任务单 #6b），闭合前**不宣称聊天全流程完成**
 - 客服账号准备走受控运维（seed / 初始化命令指定 admin_role），页面不做开户；POST agents 只是配置绑定，不是提权
 
 ---
@@ -267,9 +291,15 @@
 
 **fee-config 字段（snake_case）**：
 - `fee_rate`：十进制字符串，0~100，5 表示 5%
-- `min_fee`：十进制字符串，≥0
+- `min_fee`：十进制字符串，≥ 0，**上限 9999999999.99**
 - `payer`：`provider` / `employer` / `split`
 - `split_ratio`：**雇主承担比例 0~1**；UI 直接展示「雇主承担百分比」，提交 `split_ratio = 雇主百分比 / 100`；payer≠split 时为 null
+
+**输入精度冻结（S09，首期冻结）**：
+- **雇主承担百分比为 0~100 的整数步进（UI 侧约束）**；`30.5%` 等小数百分比**前端明确拒绝**（30.5 → 0.305 会被后端拒绝），**不静默四舍五入**（资金分摊不允许静默改值）
+- **所有提交值（fee_rate / min_fee / split_ratio）最多两位小数**，超出前端拦截
+- **禁止科学计数法输入**（如 `1e-2`）
+- 若未来需要小数百分比，**另立后端精度变更任务**（首期不做）
 
 **生效范围**：影响随后读取当前配置的业务；已预付需求后续产生的订单仍使用原费率快照。
 
@@ -281,11 +311,12 @@
 |------|------|------|------|
 | GET | `/api/v1/admin/audit-logs` | Query: `page`、`page_size`（其他筛选以后端实际支持为准） | 日志列表 |
 
-**真实结构**：`adminId`、`targetType`、`targetId`、`userAgent`、`createdAt`；detail 为 `{ before, after }`。
+**真实结构**：`adminId`、`targetType`、`targetId`、`ip`（**可空**，后端有该字段；详情抽屉可选展示，null 显示「—」）、`userAgent`、`createdAt`；detail 为 `{ before, after }`。
 
 - 不 join 管理员昵称/角色，前端展示 adminId（日志标准化 ⏳ 任务单 #9）
 - action/targetType 值不保证枚举固定（可能是 `status`、`credit-score`、`users`、`orders`、`form-templates` 等），**未知值原样回退展示**
 - 某些受控动作 before 为 null、reason 在 after 中；不假设每条日志都有完整 diff
+- **信用分动作的 `after` 为请求增量结构（`{ delta, reason }`），`delta` 不是调整后的用户信用分**（S07 修正）
 
 ---
 
@@ -329,7 +360,7 @@
 | Service/Requirement | 8 | 已实现 |
 | 订单 | 3 | 已实现 |
 | 退款 | 4 | 已实现 |
-| 客服 | 6 | agents 列表/目标查询 ⏳#6；IM 发送链路 ⏳#6 |
+| 客服 | 7 | agents 列表/目标/身份查询（cs/me）⏳#6a；IM 发送链路与全量历史 ⏳#6b |
 | Banner/标签 | 8 | 已实现；banner 上传 biz_type ⏳#8 |
 | 信用规则/系统配置/服务费 | 6 | 已实现（fee-config 在分支 codex/password-login-fee-config，提交 7afb63c） |
 | 操作日志 | 1 | 已实现（标准化 ⏳#9） |

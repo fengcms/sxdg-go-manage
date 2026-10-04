@@ -13,7 +13,7 @@
 
 1. 填写决策表，逐项裁决（见 §2、§3）
 2. 修订全部规划文档，以 `sxdg-be` 实际代码合同为准（见 §4 修订清单）
-3. 输出后端补充任务单 [admin-backend-supplement-tasks.md](../../../sxdg-be/docs/review/admin-backend-supplement-tasks.md)，区分「后端已有缺陷修复」与「新增产品能力」
+3. 输出后端补充任务单 [admin-backend-supplement-tasks.md](../../../../sxdg-be/docs/review/admin-backend-supplement-tasks.md)，区分「后端已有缺陷修复」与「新增产品能力」
 
 ---
 
@@ -222,7 +222,7 @@
 | [api-integration.md](../api-integration.md) | R03/R04/R13：全部合同修正，作为对接唯一权威 |
 | [development-plan.md](../development-plan.md) | R19：分阶段排期、首期子集、验收矩阵 |
 
-**后端任务单**：[sxdg-be/docs/review/admin-backend-supplement-tasks.md](../../../sxdg-be/docs/review/admin-backend-supplement-tasks.md)（9 项，区分缺陷修复与新增能力）
+**后端任务单**：[sxdg-be/docs/review/admin-backend-supplement-tasks.md](../../../../sxdg-be/docs/review/admin-backend-supplement-tasks.md)（9 项，区分缺陷修复与新增能力）
 
 ---
 

@@ -1,8 +1,8 @@
 # 信息架构与导航设计
 
-> 状态：规划初稿
+> 状态：已按开发前审阅裁决修订（v2）
 > 创建日期：2026-10-04
-> 依赖：[01-permission-model.md](./01-permission-model.md)
+> 依赖：[01-permission-model.md](./01-permission-model.md)（§6 单一权限来源表，菜单与按钮的唯一派生来源）
 
 ---
 
@@ -42,15 +42,17 @@
 | | 服务标签 | `/content/service-badges` | operator / super_admin |
 | 🛒 交易管理 | 订单列表 | `/orders` | 全部 |
 | | 退款审核 | `/refunds` | finance / customer_service / super_admin |
-| | 服务管理 | `/services` | operator / super_admin |
-| | 需求管理 | `/requirements` | operator / super_admin |
+| | 服务管理 | `/services` | 全部 |
+| | 需求管理 | `/requirements` | 全部 |
 | 💬 客服管理 | 客服账号 | `/cs/agents` | super_admin |
 | | 接待会话 | `/cs/sessions` | customer_service / super_admin |
 | ⚙️ 系统设置 | 系统配置 | `/system/configs` | super_admin |
 | | 信用分规则 | `/system/credit-rules` | super_admin |
+| | 服务费配置 | `/system/fee-config` | super_admin |
 | | 操作日志 | `/system/audit-logs` | super_admin |
 
 > 「全部」指 operator / finance / customer_service / super_admin 均可访问。
+> 服务管理 / 需求管理读取对**全部角色**开放（与后端合同一致，裁决 R17）：菜单对全部角色可见，写入操作按钮按权限渲染（仅 operator / super_admin）。
 
 ### 1.2 菜单可见性规则
 
@@ -94,16 +96,17 @@ const routes = [
       { path: 'orders/:id', element: <OrderDetail /> },
       { path: 'refunds', element: <RefundList />, roles: ['finance', 'customer_service'] },
       { path: 'refunds/:id', element: <RefundDetail />, roles: ['finance', 'customer_service'] },
-      { path: 'services', element: <ServiceList />, roles: ['operator'] },
-      { path: 'services/:id', element: <ServiceDetail />, roles: ['operator'] },
-      { path: 'requirements', element: <RequirementList />, roles: ['operator'] },
-      { path: 'requirements/:id', element: <RequirementDetail />, roles: ['operator'] },
+      { path: 'services', element: <ServiceList /> },
+      { path: 'services/:id', element: <ServiceDetail /> },
+      { path: 'requirements', element: <RequirementList /> },
+      { path: 'requirements/:id', element: <RequirementDetail /> },
       // 客服
       { path: 'cs/agents', element: <CsAgentList />, roles: ['super_admin'] },
       { path: 'cs/sessions', element: <CsSessions />, roles: ['customer_service'] },
       // 系统
       { path: 'system/configs', element: <SystemConfigs />, roles: ['super_admin'] },
       { path: 'system/credit-rules', element: <CreditRules />, roles: ['super_admin'] },
+      { path: 'system/fee-config', element: <FeeConfig />, roles: ['super_admin'] },
       { path: 'system/audit-logs', element: <AuditLogs />, roles: ['super_admin'] },
       // 兜底
       { path: '403', element: <ForbiddenPage /> },
@@ -155,6 +158,10 @@ const routes = [
 - 表格列支持：文本、状态徽标、日期、操作按钮组
 - 操作按钮组：查看 / 编辑 / 删除（根据权限渲染）
 
+**筛选与分页真实性约束（裁决 R06，冻结）**：
+- 筛选能力以 [api-integration.md](./api-integration.md) v2 冻结的接口参数为准，**后端不支持的筛选一律不渲染控件**（不做前端当前页过滤伪装全量搜索）
+- 分页请求参数固定 `page` / `page_size`；分页响应固定 `{ items, total, page, pageSize }`，不做其他形状的全局转换（UI 偏好其他形状时仅在 API adapter 层显式转换）
+
 ---
 
 ## 5. 详情页通用模式
@@ -167,13 +174,15 @@ const routes = [
 ├──────────────────────────────────────────────┤
 │  摘要卡片：关键字段一览（金额、状态、时间）    │
 ├──────────────────────────────────────────────┤
-│ [基本信息] [履约记录] [退款] [评价] [日志]     │  Tabs
+│ [基本信息] [资质]                             │  Tabs（示例：用户详情首期）
 ├──────────────────────────────────────────────┤
 │                                              │
 │              当前 Tab 内容                    │
 │                                              │
 └──────────────────────────────────────────────┘
 ```
+
+> Tab 以各模块文档冻结的首期范围为准：用户详情首期仅「基本信息 + 资质」，订单详情首期仅「基本信息」；履约 / 时间轴 / 交易 / 信用 / 发布内容等 Tab 移到二期（裁决 R06），无数据支撑的 Tab 一律不渲染。金额展示取记录自身的费率快照字段，不按当前配置现场重算。
 
 ---
 
@@ -191,7 +200,7 @@ const routes = [
 
 ## 7. 设计令牌引用
 
-视觉系统严格遵循 [管理后台前端技术栈与UI风格指导.md](./管理后台前端技术栈与UI风格指导.md) §5：
+视觉系统严格遵循 [管理后台前端技术栈与UI风格指导.md](../管理后台前端技术栈与UI风格指导.md) §5：
 - 色彩：oklch 语义令牌，明暗双套，禁止硬编码色值
 - 阴影：`shadow-e1 / e2 / e3` 三级语义
 - 圆角：`rounded-lg`（控件）/ `rounded-xl`（卡片）
