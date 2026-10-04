@@ -1,0 +1,354 @@
+@import "tailwindcss";
+:root {
+  --background: oklch(0.974 0.008 160);
+  --foreground: oklch(0.28 0.03 170);
+  --card: oklch(1 0 0);
+  --popover: var(--card);
+  --primary: oklch(0.39 0.07 170);
+  --primary-foreground: oklch(0.99 0 0);
+  --muted: oklch(0.94 0.012 160);
+  --muted-foreground: oklch(0.49 0.024 170);
+  --border: oklch(0.89 0.018 160);
+  --danger: oklch(0.52 0.19 27);
+  --e1: 0 2px 8px oklch(0.2 0.02 160 / 0.035);
+  --e2: 0 8px 24px oklch(0.2 0.02 160 / 0.1);
+  --e3: 0 24px 64px oklch(0.2 0.02 160 / 0.2);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--foreground);
+  background: var(--background);
+  font-size: 16px;
+  line-height: 1.6;
+}
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-popover: var(--popover);
+  --color-primary: var(--primary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-destructive: var(--danger);
+  --shadow-e1: var(--e1);
+  --shadow-e2: var(--e2);
+  --shadow-e3: var(--e3);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+button:focus-visible,
+a:focus-visible,
+.control:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.6px;
+}
+h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+h3 {
+  font-weight: 600;
+}
+p {
+  margin: 0.5rem 0;
+}
+strong {
+  font-weight: 600;
+}
+.workspace {
+  padding: 32px;
+  max-width: 1600px;
+  margin: auto;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--e1);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 7px 14px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.button:active {
+  transform: scale(0.98);
+}
+.button-default {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.button-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--foreground);
+}
+.button-danger {
+  background: var(--danger);
+  color: var(--primary-foreground);
+}
+.control {
+  display: block;
+  min-height: 38px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 7px 11px;
+  background: var(--card);
+  color: var(--foreground);
+}
+.textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+.form-field {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.form-field > label {
+  text-align: right;
+  padding-top: 8px;
+}
+.hint {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.error {
+  color: var(--danger);
+  font-size: 14px;
+}
+.badge {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 2px 9px;
+  font-size: 12px;
+  background: var(--muted);
+  color: var(--primary);
+}
+.state {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--muted-foreground);
+}
+.table-scroll {
+  overflow: auto;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+}
+th {
+  color: var(--muted-foreground);
+  font-size: 13px;
+  background: var(--muted);
+  font-weight: 500;
+}
+th,
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  font-size: 14px;
+}
+tbody tr:hover {
+  background: var(--background);
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 20px;
+  font-size: 13px;
+}
+.pagination select {
+  width: 110px;
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: oklch(0.15 0.02 160 / 0.45);
+  z-index: 40;
+  backdrop-filter: blur(2px);
+}
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(760px, 94vw);
+  max-height: 90dvh;
+  overflow: auto;
+  background: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--e3);
+  padding: 26px;
+  z-index: 41;
+}
+.modal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 20px;
+  font-weight: 600;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.page-heading p {
+  color: var(--muted-foreground);
+  font-size: 14px;
+}
+.filters {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.filters .form-field {
+  display: block;
+  margin: 0;
+  min-width: 140px;
+}
+.filters label {
+  font-size: 12px;
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.detail-grid dt {
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+.detail-grid dd {
+  margin: 5px 0;
+  overflow-wrap: anywhere;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--muted);
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.notice {
+  background: var(--muted);
+  padding: 12px 16px;
+  border-radius: 9px;
+  margin-bottom: 20px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+}
+.app-bg {
+  background:
+    radial-gradient(
+      ellipse at top right,
+      color-mix(in oklch, var(--primary) 6%, transparent),
+      transparent 60%
+    ),
+    var(--background);
+  min-height: 100dvh;
+}
+@media (max-width: 640px) {
+  .workspace {
+    padding: 20px 14px;
+  }
+  .card {
+    padding: 16px;
+  }
+  .form-field {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .form-field > label {
+    text-align: left;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .pagination {
+    flex-wrap: wrap;
+  }
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
