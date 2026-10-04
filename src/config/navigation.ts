@@ -21,7 +21,7 @@ export const navigation: NavItem[] = [
       path: `/content/${v}`,
       title: ["分类体系", "热门分类", "动态表单", "Banner 管理", "服务标签"][i],
       group: "内容运营",
-      roles: ["operator"] as Role[],
+      roles: v === "form-templates" ? allRoles : (["operator"] as Role[]),
     }),
   ),
   ...["orders", "refunds", "services", "requirements"].map((v, i) => ({

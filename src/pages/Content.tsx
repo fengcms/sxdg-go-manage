@@ -4,7 +4,7 @@ import { StatusTag } from "../components/ui/status";
 
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { adminPath, allPages } from "../api/admin";
 import { ResourceList } from "../components/data/ResourceList";
 import { ActionDialog, type ActionSpec, type FieldSpec } from "../components/feedback/ActionDialog";
@@ -69,6 +69,7 @@ export function categoryPath(row: Category, rows: Category[]) {
 }
 export default function Content() {
   const { kind = "categories" } = useParams();
+  const navigate = useNavigate();
   const [action, setAction] = useState<ActionSpec | null>(null);
   const cats = useQuery({
     queryKey: qk.resource("all-categories"),
@@ -78,6 +79,10 @@ export default function Content() {
   if (!valid) return <p>页面不存在</p>;
   const rows = cats.data || [];
   function edit(row?: ContentRow) {
+    if (kind === "form-templates") {
+      navigate(`/content/form-templates/${row?.id ?? "new"}`);
+      return;
+    }
     const base: FieldSpec[] = [];
     const add = (
       key: string,
