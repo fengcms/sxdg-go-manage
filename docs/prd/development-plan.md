@@ -1,5 +1,7 @@
 # 管理后台开发计划与排期
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：v4（按 [review/06-third-round-decisions.md](./review/06-third-round-decisions.md) T05 裁决修订：执行顺序改「**后端批次 A 先行**」、验收 mock 两级边界、依赖表契约冻结标注、#10 改名「统一登录时间维护（三入口）」；v3 依据 [review/04-second-round-decisions.md](./review/04-second-round-decisions.md) S05/S10）
 > 创建日期：2026-10-04
 > 技术栈：React 19 + Vite + TS + Tailwind v4 + TanStack Query + RHF/Zod

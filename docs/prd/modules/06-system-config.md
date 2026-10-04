@@ -1,5 +1,7 @@
 # 模块六：系统配置与信用分规则
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](../api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：v4（按 [review/06-third-round-decisions.md](../review/06-third-round-decisions.md) T03 裁决修订：信用分配置组合约束冻结（`0 ≤ min ≤ initial ≤ max ≤ 100000`）、同表单整体组合校验、下调上限不批量重算存量、存量非法配置由部署检查修复；v3 依据 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S06/S09）
 > 创建日期：2026-10-04
 > 后端接口：`/api/v1/admin/system-configs`、`/api/v1/admin/credit-rules`、`/api/v1/admin/fee-config`

@@ -1,5 +1,7 @@
 # 四系点工 · 管理后台总体规划
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：已按开发前审阅裁决修订（v2）
 > 创建日期：2026-10-04
 > 关联：对接唯一权威 [api-integration.md](./api-integration.md)；裁决记录 [review/02-pre-development-decisions.md](./review/02-pre-development-decisions.md)；后端 [api-spec.md](../../../sxdg-be/docs/api-spec.md) / [enums.md](../../../sxdg-be/docs/enums.md) / [schema.md](../../../sxdg-be/docs/schema.md)

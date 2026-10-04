@@ -1,5 +1,7 @@
 # 模块五：客服管理
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](../api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：v4（按 [review/06-third-round-decisions.md](../review/06-third-round-decisions.md) T02 裁决修订：转接权改后端服务实现（移除 super_admin 代转豁免）、修正未绑定 super_admin 语义（仍可查看全量会话元信息）、cs/me 补 `isActive`、online 目标接口角色与容量二次校验、会话列表保留 `user1Id`/`user2Id`；v3 依据 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S04）
 > 创建日期：2026-10-04
 > 后端接口：`/api/v1/admin/cs/agents`、`/api/v1/admin/cs/sessions`、`/api/v1/admin/cs/me`（⏳ #6a）

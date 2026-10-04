@@ -1,5 +1,7 @@
 # 模块七：操作日志
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](../api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：v3（按 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S07 裁决修订：修正 IP 断言（后端有可空 ip 字段，详情抽屉可选展示）、信用分日志示例改为实际动作结构）
 > 创建日期：2026-10-04
 > 后端接口：`GET /api/v1/admin/audit-logs`

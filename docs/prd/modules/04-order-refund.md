@@ -1,5 +1,7 @@
 # 模块四：订单与退款管理
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](../api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：v4（按 [review/06-third-round-decisions.md](../review/06-third-round-decisions.md) T06 裁决修订：结算展示语义冻结——**展示结算对象及状态**（status=0=待结算、1=已入账），无流水返回 null（展示「暂无结算」），**不把待结算金额标作实收**；订单列表首期**维持双方 ID 展示**，不做批量摘要（#4 聚合仅详情）；v3 依据 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S03）
 > 创建日期：2026-10-04
 > 后端接口：`/api/v1/admin/orders`、`/api/v1/admin/refunds`、`/api/v1/admin/services`、`/api/v1/admin/requirements`

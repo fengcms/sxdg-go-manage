@@ -1,5 +1,7 @@
 # 模块一：数据看板
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](../api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：v4（按 [review/06-third-round-decisions.md](../review/06-third-round-decisions.md) T04 事实纠正修订：**密码与短信登录均不更新 `last_login_at`**，缺口标注改「密码与短信登录暂不计入」；微信登录更新但发生在封禁检查之前，#10 一并修正时机；v3 依据 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S08）
 > 创建日期：2026-10-04
 > 后端接口：`GET /api/v1/admin/dashboard/{overview,orders,users,finance}`（已实现）

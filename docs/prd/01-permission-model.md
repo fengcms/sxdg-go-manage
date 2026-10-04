@@ -1,5 +1,7 @@
 # 管理后台权限模型与鉴权方案
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：已按开发前审阅裁决修订（v2）
 > 创建日期：2026-10-04
 > 权威来源：后端 `internal/router/admin.go` 的 `adminRoutes` 角色映射 + `internal/middleware/middleware.go` 的 `Admin()` 中间件；对接合同以 [api-integration.md](./api-integration.md) 为准

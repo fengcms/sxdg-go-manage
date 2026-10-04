@@ -1,5 +1,7 @@
 # 模块三：内容管理
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](../api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：v4（按 [review/06-third-round-decisions.md](../review/06-third-round-decisions.md) T06 裁决修订：分类删除语义冻结「**引用存在即拒绝删除**」（引用检查覆盖全部状态，含历史已下架/已关闭记录）、**维持平铺分页构树、不提供树接口**；v3 依据 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S01/S02）
 > 创建日期：2026-10-04
 > 后端接口：`/api/v1/admin/categories`、`/featured-categories`、`/form-templates`、`/banners`、`/service-badges`

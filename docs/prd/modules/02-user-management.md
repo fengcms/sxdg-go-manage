@@ -1,5 +1,7 @@
 # 模块二：用户管理与资质审核
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](../api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：v4（按 [review/06-third-round-decisions.md](../review/06-third-round-decisions.md) T01 裁决修订：封禁 DTO 冻结为 `banned`/`banReason`/`bannedAt`，原因/时间取自审计日志最近一次状态动作、解封后置 null、历史缺失不编造；封禁/解封 reason 后端已同步加非空校验；v3 依据 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S01/S05）
 > 创建日期：2026-10-04
 > 后端接口：`/api/v1/admin/users`、`/api/v1/admin/qualifications`

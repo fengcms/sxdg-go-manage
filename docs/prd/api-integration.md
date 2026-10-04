@@ -1,5 +1,7 @@
 # 前后端接口对接清单（合同版）
 
+> 开发状态更新（2026-10-04）：后端 A/B 已交付。下文“待补”及旧能力描述保留为产品裁决上下文，实施时先读 [当前对接补充](api-current.md)，以其中逐项更新为准；首期范围与二期边界不自动扩大。
+
 > 状态：v4（按 [review/06-third-round-decisions.md](./review/06-third-round-decisions.md) T02/T04/T06 裁决同步修订：看板缺口改「密码与短信登录暂不计入」、客服转接权服务端化与 cs/me 补 isActive、分类删除冻结「引用存在即拒绝」；v3 依据 [review/04-second-round-decisions.md](./review/04-second-round-decisions.md) S01/S02/S04/S08/S09）
 > 日期：2026-10-04
 > 权威性：本文是管理后台前端对接的**唯一合同**。与《管理后台前端技术栈与UI风格指导.md》冲突时，以本文为准。
