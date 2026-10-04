@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 // 内容运营表单显式白名单提交；分类读取全部分页，删除交给后端引用保护。
 
 import { useQuery } from "@tanstack/react-query";
@@ -168,7 +169,8 @@ export default function Content() {
     if (kind !== "form-templates") add("sortOrder", "排序值", "number", true);
     add("isActive", "启用状态", "select", true, yesNo);
     for (const f of base)
-      if (f.type === "datetime-local" && f.default) f.default = f.default.slice(0, 16);
+      if (f.type === "datetime-local" && f.default)
+        f.default = format(new Date(f.default), "yyyy-MM-dd'T'HH:mm");
     setAction({
       title: `${row ? "编辑" : "新建"}${titles[kind]}`,
       path: adminPath(`${kind}${row ? `/${row.id}` : ""}`),
@@ -223,6 +225,7 @@ export default function Content() {
   return (
     <>
       <ResourceList<ContentRow>
+        key={kind}
         kind={kind}
         title={titles[kind]}
         description={

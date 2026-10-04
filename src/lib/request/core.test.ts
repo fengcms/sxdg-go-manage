@@ -69,3 +69,41 @@ describe("会话请求", () => {
     expect(useAuth.getState().user).toBeNull();
   });
 });
+
+it("403 不尝试刷新", async () => {
+  const f = vi.fn(async () => response(null, 403));
+  vi.stubGlobal("fetch", f);
+  await expect(request("/forbidden")).rejects.toThrow();
+  expect(f).toHaveBeenCalledTimes(1);
+});
+
+it("旧刷新失败不会清除新用户会话", async () => {
+  let fail: (response: Response) => void = () => {};
+  let started: () => void = () => {};
+  const refreshing = new Promise<void>((r) => {
+    started = r;
+  });
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      if (url.includes("refresh")) {
+        started();
+        return new Promise<Response>((r) => {
+          fail = r;
+        });
+      }
+      return response(null, 401);
+    }),
+  );
+  const pending = request("/old-user");
+  await refreshing;
+  useAuth
+    .getState()
+    .set(
+      { accessToken: "other", refreshToken: "other-refresh", expiresIn: 60 },
+      { id: 2, nickname: "乙", isAdmin: true, adminRole: "finance" },
+    );
+  fail(response(null, 401));
+  await expect(pending).rejects.toThrow();
+  expect(useAuth.getState().user?.id).toBe(2);
+});

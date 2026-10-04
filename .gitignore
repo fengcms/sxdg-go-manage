@@ -7,3 +7,5 @@ test-results/
 *.log
 
 .e2e-accounts.json
+
+.e2e-fixtures.json

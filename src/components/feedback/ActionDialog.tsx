@@ -1,3 +1,4 @@
+import { useBlocker } from "react-router-dom";
 import { TemplatePreview } from "../form/TemplatePreview";
 import { UploadInput } from "../form/UploadInput";
 // 写操作先校验再二次确认，失败保留输入，完成后刷新服务端状态。
@@ -59,6 +60,7 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
     resolver: zodResolver(z.object(shape)),
     defaultValues: Object.fromEntries(fields.map((f) => [f.key, f.default ?? ""])),
   });
+  const blocker = useBlocker(isDirty && !isSubmitting);
   const payer = watch("payer");
   useEffect(() => {
     if (payer && payer !== "split") setValue("percent", "");
@@ -161,6 +163,21 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
             </Button>
           </div>
         </form>
+      </Modal>
+      <Modal
+        title="离开并放弃修改？"
+        open={blocker.state === "blocked"}
+        onClose={() => blocker.state === "blocked" && blocker.reset()}
+      >
+        <p>当前表单尚未保存。</p>
+        <div className="form-actions">
+          <Button variant="ghost" onClick={() => blocker.state === "blocked" && blocker.reset()}>
+            继续编辑
+          </Button>
+          <Button variant="danger" onClick={() => blocker.state === "blocked" && blocker.proceed()}>
+            离开页面
+          </Button>
+        </div>
       </Modal>
       <Modal title="放弃未保存的修改？" open={discard} onClose={() => setDiscard(false)}>
         <p>关闭后本次输入不会保存。</p>

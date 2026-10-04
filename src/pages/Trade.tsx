@@ -199,6 +199,7 @@ export default function Trade() {
         </>
       ) : (
         <ResourceList<Row>
+          key={kind}
           kind={kind}
           title={titles[kind]}
           description={

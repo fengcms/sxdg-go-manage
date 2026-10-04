@@ -43,6 +43,7 @@ export function Qualifications({ userId }: { userId?: number }) {
   return (
     <>
       <ResourceList<Qualification>
+        queryPrefix={userId ? "cert_" : ""}
         kind={userId ? `users/${userId}/qualifications` : "qualifications"}
         title={userId ? "用户资质" : "资质审核"}
         description="审核真实资料；证件图片仅通过鉴权请求读取"

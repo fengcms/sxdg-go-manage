@@ -32,7 +32,7 @@ export function UserResources({ id }: { id: number }) {
               setParams(
                 (p) => {
                   p.set("tab", key);
-                  p.set("page", "1");
+                  p.set("resource_page", "1");
                   return p;
                 },
                 { replace: true },
@@ -44,6 +44,7 @@ export function UserResources({ id }: { id: number }) {
         ))}
       </section>
       <ResourceList<Row>
+        queryPrefix="resource_"
         key={tab}
         kind={`users/${id}/${tab}`}
         title={tabs[tab as keyof typeof tabs]}

@@ -22,6 +22,7 @@ export function ResourceList<T extends { id: number }>({
   filters = [],
   actions,
   extra,
+  queryPrefix = "",
 }: {
   kind: string;
   title: string;
@@ -30,12 +31,15 @@ export function ResourceList<T extends { id: number }>({
   filters?: Filter[];
   actions?: ReactNode;
   extra?: ReactNode;
+  queryPrefix?: string;
 }) {
-  const { params, page, pageSize, patch } = useTableQuery();
+  const { params, page, pageSize, patch } = useTableQuery(queryPrefix);
   const query = {
     page,
     page_size: pageSize,
-    ...Object.fromEntries(filters.map((f) => [f.key, params.get(f.key) || undefined])),
+    ...Object.fromEntries(
+      filters.map((f) => [f.key, params.get(`${queryPrefix}${f.key}`) || undefined]),
+    ),
   };
   const result = useList<T>(kind, query);
   const [draft, setDraft] = useState<Record<string, string>>({});
@@ -62,7 +66,7 @@ export function ResourceList<T extends { id: number }>({
               <FormField key={f.key} id={`filter-${f.key}`} label={f.label}>
                 <FilterInput
                   filter={f}
-                  value={draft[f.key] ?? params.get(f.key) ?? ""}
+                  value={draft[f.key] ?? params.get(`${queryPrefix}${f.key}`) ?? ""}
                   change={(v) => setDraft((s) => ({ ...s, [f.key]: v }))}
                 />
               </FormField>
