@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { StatusTag } from "../components/ui/status";
 // 内容运营表单显式白名单提交；分类读取全部分页，删除交给后端引用保护。
 
 import { useQuery } from "@tanstack/react-query";
@@ -253,17 +254,42 @@ export default function Content() {
           {
             key: "name",
             label: "名称 / 标题",
+            wrap: true,
             render: (r) =>
-              kind === "categories"
-                ? categoryPath(r as Category, rows)
-                : text(r.name ?? r.templateName ?? r.title),
+              kind === "categories" ? (
+                <div className="category-cell">
+                  <span className="hint">{r.level}级分类</span>
+                  <strong>{r.name}</strong>
+                  <small>{categoryPath(r as Category, rows)}</small>
+                </div>
+              ) : (
+                text(r.name ?? r.templateName ?? r.title)
+              ),
           },
           {
             key: "sort",
             label: kind === "form-templates" ? "版本" : "排序",
             render: (r) => text(r.version ?? r.sortOrder),
           },
-          { key: "active", label: "状态", render: (r) => (r.isActive ? "启用" : "停用") },
+          ...(kind === "banners"
+            ? [
+                {
+                  key: "image",
+                  label: "图片",
+                  render: (r: ContentRow) =>
+                    r.imageUrl ? (
+                      <img className="table-thumbnail" src={r.imageUrl} alt={r.title || "横幅"} />
+                    ) : (
+                      "—"
+                    ),
+                },
+              ]
+            : []),
+          {
+            key: "active",
+            label: "状态",
+            render: (r) => <StatusTag label={r.isActive ? "启用" : "停用"} />,
+          },
           {
             key: "actions",
             label: "操作",
@@ -292,7 +318,7 @@ export default function Content() {
                   </Button>
                 )}
                 <Button
-                  variant="danger"
+                  variant="danger-ghost"
                   onClick={() =>
                     setAction({
                       title: kind === "featured-categories" ? "删除热门入口" : "停用 / 删除",

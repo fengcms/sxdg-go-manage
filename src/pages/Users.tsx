@@ -101,8 +101,20 @@ export default function Users() {
                       用户 #{detail.data.id} · {text(detail.data.phoneMasked)}
                     </p>
                   </div>
-                  <Badge tone={detail.data.banned ? "danger" : "success"}>
-                    {detail.data.banned ? "已封禁" : "正常"}
+                  <Badge
+                    tone={
+                      typeof detail.data.banned !== "boolean"
+                        ? "neutral"
+                        : detail.data.banned
+                          ? "danger"
+                          : "success"
+                    }
+                  >
+                    {typeof detail.data.banned !== "boolean"
+                      ? "未知"
+                      : detail.data.banned
+                        ? "已封禁"
+                        : "正常"}
                   </Badge>
                 </div>
                 <h2 className="section-heading">基本资料</h2>

@@ -7,12 +7,18 @@ import { Toaster } from "sonner";
 import { queryClient } from "./lib/queryClient";
 import { Router } from "./router";
 import "./index.css";
+import { usePreferences } from "./store/preferences";
+
+function Notifications() {
+  const theme = usePreferences((s) => s.theme);
+  return <Toaster theme={theme} richColors position="top-right" />;
+}
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <Router />
-      <Toaster richColors position="top-right" />
+      <Notifications />
     </QueryClientProvider>
   </StrictMode>,
 );

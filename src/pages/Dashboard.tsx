@@ -1,9 +1,10 @@
+import { Activity, RefreshCw, ShoppingBag, Users, Wallet } from "lucide-react";
 // 看板保持服务端数组口径，不补零或假造趋势。
 import { useParams } from "react-router-dom";
 import { useDetail } from "../api/admin";
 import { DataTable } from "../components/data/DataTable";
 import { State } from "../components/feedback/State";
-import { Card } from "../components/ui";
+import { Button, Card } from "../components/ui";
 import { money, text } from "../lib/utils";
 
 const labels: Record<string, string> = {
@@ -53,9 +54,16 @@ export default function Dashboard() {
         <div>
           <span className="eyebrow">平台运行概况</span>
           <h1>{labels[kind]}</h1>
-          <p>清晰看见平台的每一步运转</p>
+          <p>平台业务与运营数据概览</p>
         </div>
-        <span className="badge">实时接口数据</span>
+        <Button
+          variant="outline"
+          onClick={() => void result.refetch()}
+          disabled={result.isFetching}
+        >
+          <RefreshCw size={14} />
+          刷新统计
+        </Button>
       </div>
       <p className="notice">{notes[kind]}</p>
       <State
@@ -72,14 +80,31 @@ export default function Dashboard() {
                   .filter(([key]) => Object.hasOwn(row, key))
                   .map(([key, label]) => (
                     <Card key={`${JSON.stringify(row)}-${key}`}>
-                      <p className="hint">{label}</p>
+                      <div className="stat-heading">
+                        <p>{label}</p>
+                        <span className="stat-icon">
+                          {key === "users" ? (
+                            <Users size={20} />
+                          ) : key === "orders" ? (
+                            <ShoppingBag size={20} />
+                          ) : key === "active_users" ? (
+                            <Activity size={20} />
+                          ) : (
+                            <Wallet size={20} />
+                          )}
+                        </span>
+                      </div>
                       <strong className="stat-number">
                         {key === "users" || key === "orders" || key === "active_users"
                           ? text(row[key])
                           : money(row[key])}
                       </strong>
                       <p className="hint">
-                        {key === "active_users" ? "三入口有效登录 · 滚动 24 小时" : "后端聚合统计"}
+                        {key === "active_users"
+                          ? "有效登录 · 滚动 24 小时"
+                          : key === "users" || key === "orders"
+                            ? "平台累计"
+                            : "单位：元"}
                       </p>
                     </Card>
                   )),

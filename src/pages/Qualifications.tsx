@@ -1,3 +1,4 @@
+import { StatusTag } from "../components/ui/status";
 // 资质队列与用户资质复用分页组件，证件走受保护二进制请求。
 
 import { useQuery } from "@tanstack/react-query";
@@ -71,7 +72,11 @@ export function Qualifications({ userId }: { userId?: number }) {
           {
             key: "status",
             label: "状态",
-            render: (r) => ["待审核", "已通过", "已拒绝"][r.status] || `未知（${r.status}）`,
+            render: (r) => (
+              <StatusTag
+                label={["待审核", "已通过", "已拒绝"][r.status] || `未知（${r.status}）`}
+              />
+            ),
           },
           { key: "time", label: "提交时间", render: (r) => dateText(r.createdAt) },
           {

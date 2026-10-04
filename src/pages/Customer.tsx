@@ -1,3 +1,4 @@
+import { StatusTag } from "../components/ui/status";
 // 客服首期只读消息和流转；供应商发送链路尚未开放。
 
 import { useQuery } from "@tanstack/react-query";
@@ -117,8 +118,16 @@ function Agents() {
             ),
           },
           { key: "name", label: "显示名", render: (r) => r.nickname },
-          { key: "online", label: "在线状态", render: (r) => (r.isOnline ? "在线" : "离线") },
-          { key: "active", label: "启用状态", render: (r) => (r.isActive ? "启用" : "停用") },
+          {
+            key: "online",
+            label: "在线状态",
+            render: (r) => <StatusTag label={r.isOnline ? "在线" : "离线"} />,
+          },
+          {
+            key: "active",
+            label: "启用状态",
+            render: (r) => <StatusTag label={r.isActive ? "启用" : "停用"} />,
+          },
           {
             key: "capacity",
             label: "当前 / 最大接待",
@@ -194,6 +203,7 @@ function Sessions() {
       </State>
       <div className="cs-grid">
         <Card>
+          <h2>接待会话</h2>
           <State
             loading={list.isLoading}
             error={list.error}
@@ -209,7 +219,12 @@ function Sessions() {
                     key: "user",
                     label: "会话用户",
                     render: (r) => (
-                      <Button variant="ghost" onClick={() => setSelected(r.id)}>
+                      <Button
+                        variant="ghost"
+                        className={selected === r.id ? "selected-session" : undefined}
+                        aria-pressed={selected === r.id}
+                        onClick={() => setSelected(r.id)}
+                      >
                         {r.user?.nickname || `用户 #${r.user1Id}`}
                       </Button>
                     ),
@@ -236,7 +251,7 @@ function Sessions() {
             />
           )}
         </Card>
-        <Card>
+        <Card className="message-panel">
           {current ? (
             <>
               <h2>会话 #{current.id}</h2>
@@ -326,19 +341,21 @@ function Messages({ id }: { id: number }) {
         empty={data.data?.items.length === 0}
         retry={() => void data.refetch()}
       >
-        {data.data?.items.map((m) => (
-          <article className="chat-message" key={m.id}>
-            <p className="hint">
-              {m.senderId ? `用户 #${m.senderId}` : "系统"} · {dateText(m.createdAt)}
-            </p>
-            {m.type === "image" && m.content?.startsWith("/uploads/") ? (
-              <img className="upload-preview" src={m.content} alt="消息图片" />
-            ) : (
-              <p>{m.content}</p>
-            )}
-            {m.cardPayload != null && <pre>{JSON.stringify(m.cardPayload, null, 2)}</pre>}
-          </article>
-        ))}
+        <div className="message-scroll">
+          {data.data?.items.map((m) => (
+            <article className="chat-message" key={m.id}>
+              <p className="hint">
+                {m.senderId ? `用户 #${m.senderId}` : "系统"} · {dateText(m.createdAt)}
+              </p>
+              {m.type === "image" && m.content?.startsWith("/uploads/") ? (
+                <img className="upload-preview" src={m.content} alt="消息图片" />
+              ) : (
+                <p>{m.content}</p>
+              )}
+              {m.cardPayload != null && <pre>{JSON.stringify(m.cardPayload, null, 2)}</pre>}
+            </article>
+          ))}
+        </div>
       </State>
       {data.data && (
         <Pagination

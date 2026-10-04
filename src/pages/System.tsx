@@ -1,3 +1,4 @@
+import { StatusTag } from "../components/ui/status";
 // 系统配置逐键说明生效范围，审计保留原始结构和中文摘要。
 
 import { useQuery } from "@tanstack/react-query";
@@ -102,7 +103,11 @@ function ConfigRules({ rules }: { rules: boolean }) {
             { key: "key", label: "行为键", render: (r) => r.behaviorKey },
             { key: "name", label: "行为名称", render: (r) => r.name },
             { key: "delta", label: "分值增减", render: (r) => r.delta },
-            { key: "active", label: "状态", render: (r) => (r.isActive ? "启用" : "停用") },
+            {
+              key: "active",
+              label: "状态",
+              render: (r) => <StatusTag label={r.isActive ? "启用" : "停用"} />,
+            },
             { key: "updated", label: "更新时间", render: (r) => dateText(r.updatedAt) },
             {
               key: "action",
@@ -306,8 +311,8 @@ function AuditLogs() {
             <Details
               fields={[
                 ["管理员", view.admin?.nickname || view.adminId],
-                ["原动作", view.action],
-                ["原对象类型", view.targetType],
+                ["操作", view.actionLabel || view.action],
+                ["对象", view.targetLabel || view.targetType],
                 ["对象 ID", view.targetId],
                 ["时间", dateText(view.createdAt)],
                 ["IP", text(view.ip)],
@@ -315,10 +320,13 @@ function AuditLogs() {
                 ["原因", text(view.detail.reason)],
               ]}
             />
-            <h3>变更前</h3>
-            <pre>{JSON.stringify(view.detail.before, null, 2)}</pre>
-            <h3>变更后（请求增量或对象，以实际记录为准）</h3>
-            <pre>{JSON.stringify(view.detail.after, null, 2)}</pre>
+            <details className="audit-raw">
+              <summary>查看原始变更明细</summary>
+              <h3>变更前</h3>
+              <pre>{JSON.stringify(view.detail.before, null, 2)}</pre>
+              <h3>变更后（请求增量或对象，以实际记录为准）</h3>
+              <pre>{JSON.stringify(view.detail.after, null, 2)}</pre>
+            </details>
           </>
         )}
       </Modal>

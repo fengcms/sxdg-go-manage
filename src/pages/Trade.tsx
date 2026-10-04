@@ -7,7 +7,8 @@ import { TradeSummary } from "../components/data/TradeSummary";
 import { ActionDialog, type ActionSpec } from "../components/feedback/ActionDialog";
 import { Details } from "../components/feedback/Details";
 import { State } from "../components/feedback/State";
-import { Badge, Button, Card } from "../components/ui";
+import { Button, Card } from "../components/ui";
+import { StatusTag } from "../components/ui/status";
 import { actions, allowed } from "../lib/permission";
 import { orderAction, states, validRefund } from "../lib/trade";
 import { dateText, money, text } from "../lib/utils";
@@ -163,9 +164,7 @@ export default function Trade() {
                     </span>
                     <h2>{result.data.orderNo || result.data.refundNo || `#${result.data.id}`}</h2>
                   </div>
-                  <Badge tone={result.data.status === 0 ? "warning" : "info"}>
-                    {status(result.data)}
-                  </Badge>
+                  <StatusTag label={status(result.data)} />
                 </div>
                 <h2 className="section-heading">基本信息与履约记录</h2>
                 <Details
@@ -287,10 +286,11 @@ export default function Trade() {
                 </Link>
               ),
             },
-            { key: "status", label: "状态", render: (r) => <Badge>{status(r)}</Badge> },
+            { key: "status", label: "状态", render: (r) => <StatusTag label={status(r)} /> },
             {
               key: "amount",
               label: kind === "refunds" ? "申请金额" : "金额",
+              align: "right",
               render: (r) => money(r.applyAmount ?? r.amount ?? r.displayPrice),
             },
             ...(kind === "orders"

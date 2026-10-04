@@ -165,10 +165,20 @@ export default function AdminLayout() {
             <Button variant="ghost" size="icon" aria-label="切换主题" onClick={toggleTheme}>
               {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
             </Button>
-            <span className="avatar" aria-hidden="true">
-              {user?.nickname?.slice(0, 1) || "管"}
-            </span>
-            <span className="account-name">{user?.nickname}</span>
+            <details className="account-menu">
+              <summary aria-label="账户菜单">
+                <span className="avatar" aria-hidden="true">
+                  {user?.nickname?.slice(0, 1) || "管"}
+                </span>
+                <span className="account-name">我的账户</span>
+              </summary>
+              <div className="account-popover">
+                <strong>{user?.nickname}</strong>
+                <p className="hint">{roles[user?.adminRole as keyof typeof roles] || "未知角色"}</p>
+                <p className="hint">刷新页面需要重新登录</p>
+              </div>
+            </details>
+
             <span className="badge">
               {roles[user?.adminRole as keyof typeof roles] || "未知角色"}
             </span>
