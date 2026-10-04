@@ -1,0 +1,155 @@
+[
+  {
+    "path": "/api/v1/auth/me",
+    "dataType": "dict",
+    "keys": [
+      "avatarUrl",
+      "backgroundImageUrl",
+      "bio",
+      "birthday",
+      "creditScore",
+      "followStats",
+      "gender",
+      "id",
+      "nickname",
+      "points",
+      "profession",
+      "realNameVerified",
+      "regionCode",
+      "roleTags",
+      "showRealName",
+      "skillLevel",
+      "wallet"
+    ]
+  },
+  {
+    "path": "/api/v1/admin/dashboard/overview",
+    "dataType": "list",
+    "itemKeys": [
+      "active_users",
+      "orders",
+      "service_gmv",
+      "users"
+    ]
+  },
+  {
+    "path": "/api/v1/admin/dashboard/orders",
+    "dataType": "list",
+    "itemKeys": [
+      "amount",
+      "count",
+      "status"
+    ]
+  },
+  {
+    "path": "/api/v1/admin/dashboard/users",
+    "dataType": "list",
+    "itemKeys": [
+      "active_users",
+      "date",
+      "new_users"
+    ]
+  },
+  {
+    "path": "/api/v1/admin/dashboard/finance",
+    "dataType": "list",
+    "itemKeys": [
+      "available_balance",
+      "fees",
+      "frozen_balance",
+      "refunded",
+      "settled",
+      "withdrawn"
+    ]
+  },
+  {
+    "path": "/api/v1/admin/users?page_size=1",
+    "dataType": "dict",
+    "keys": [
+      "items",
+      "page",
+      "pageSize",
+      "total"
+    ],
+    "itemKeys": [
+      "id",
+      "nickname",
+      "avatarUrl",
+      "backgroundImageUrl",
+      "gender",
+      "bio",
+      "birthday",
+      "profession",
+      "roleTags",
+      "showRealName",
+      "realNameVerified",
+      "balance",
+      "frozenBalance",
+      "creditScore",
+      "points",
+      "skillLevel",
+      "isEmployer",
+      "isProvider",
+      "isAdmin",
+      "adminRole",
+      "regionCode",
+      "lastLoginAt",
+      "createdAt",
+      "updatedAt"
+    ]
+  },
+  {
+    "path": "/api/v1/admin/categories?page_size=1",
+    "dataType": "dict",
+    "keys": [
+      "items",
+      "page",
+      "pageSize",
+      "total"
+    ],
+    "itemKeys": [
+      "id",
+      "parentId",
+      "name",
+      "iconUrl",
+      "level",
+      "sortOrder",
+      "showOnHome",
+      "isActive",
+      "createdAt",
+      "updatedAt"
+    ]
+  },
+  {
+    "path": "/api/v1/admin/audit-logs?page_size=1",
+    "dataType": "dict",
+    "keys": [
+      "items",
+      "page",
+      "pageSize",
+      "total"
+    ],
+    "itemKeys": [
+      "id",
+      "adminId",
+      "action",
+      "targetType",
+      "targetId",
+      "detail",
+      "ip",
+      "userAgent",
+      "createdAt"
+    ]
+  },
+  {
+    "path": "/api/v1/admin/fee-config",
+    "dataType": "dict",
+    "keys": [
+      "id",
+      "fee_rate",
+      "min_fee",
+      "payer",
+      "split_ratio"
+    ]
+  }
+]
