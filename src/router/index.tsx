@@ -15,6 +15,7 @@ const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Users = lazy(() => import("../pages/Users"));
 const Qualifications = lazy(() => import("../pages/Qualifications"));
 const Content = lazy(() => import("../pages/Content"));
+const Trade = lazy(() => import("../pages/Trade"));
 const Login = lazy(() => import("../pages/Login"));
 const Layout = lazy(() => import("../layouts/AdminLayout"));
 function Guard() {
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
           { path: "/users", element: <Users /> },
           { path: "/users/:id", element: <Users /> },
           { path: "/content/:kind", element: <Content /> },
+          ...["orders", "refunds", "services", "requirements"].flatMap((kind) => [
+            { path: `/${kind}`, element: <Trade /> },
+            { path: `/${kind}/:id`, element: <Trade /> },
+          ]),
           { path: "*", element: <Placeholder /> },
         ],
       },
