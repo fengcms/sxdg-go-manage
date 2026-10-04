@@ -16,6 +16,7 @@ const Users = lazy(() => import("../pages/Users"));
 const Qualifications = lazy(() => import("../pages/Qualifications"));
 const Content = lazy(() => import("../pages/Content"));
 const Trade = lazy(() => import("../pages/Trade"));
+const Customer = lazy(() => import("../pages/Customer"));
 const Login = lazy(() => import("../pages/Login"));
 const Layout = lazy(() => import("../layouts/AdminLayout"));
 function Guard() {
@@ -62,6 +63,8 @@ const router = createBrowserRouter([
             { path: `/${kind}`, element: <Trade /> },
             { path: `/${kind}/:id`, element: <Trade /> },
           ]),
+          { path: "/cs/agents", element: <Customer /> },
+          { path: "/cs/sessions", element: <Customer /> },
           { path: "*", element: <Placeholder /> },
         ],
       },

@@ -594,3 +594,24 @@ pre {
 .control[multiple] {
   min-height: 120px;
 }
+
+.cs-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+}
+.chat-message {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.message-excerpt {
+  display: block;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 1279px) {
+  .cs-grid {
+    grid-template-columns: 1fr;
+  }
+}
