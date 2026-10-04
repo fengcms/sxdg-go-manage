@@ -24,7 +24,7 @@ export default function Users() {
     <div className="actions">
       {allowed(role, actions.ban) && !u.isAdmin && (
         <Button
-          variant="ghost"
+          variant={u.banned ? "ghost" : "danger-ghost"}
           disabled={typeof u.banned !== "boolean"}
           onClick={() =>
             setAction({
@@ -152,14 +152,23 @@ export default function Users() {
             {
               key: "nickname",
               label: "昵称",
-              render: (u) => <Link to={`/users/${u.id}`}>{u.nickname || `用户 #${u.id}`}</Link>,
+              render: (u) => (
+                <Link className="user-cell" to={`/users/${u.id}`}>
+                  <span className="avatar" aria-hidden="true">
+                    {u.nickname?.slice(0, 1) || "用"}
+                  </span>
+                  <span className="cell-title">{u.nickname || `用户 #${u.id}`}</span>
+                </Link>
+              ),
             },
             { key: "credit", label: "信用分", render: (u) => u.creditScore },
             {
               key: "banned",
               label: "账号状态",
               render: (u) => (
-                <Badge>
+                <Badge
+                  tone={typeof u.banned !== "boolean" ? "neutral" : u.banned ? "danger" : "success"}
+                >
                   {typeof u.banned === "boolean" ? (u.banned ? "已封禁" : "正常") : "未知"}
                 </Badge>
               ),
