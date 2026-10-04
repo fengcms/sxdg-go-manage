@@ -145,3 +145,20 @@ it("嵌套深度根面板为0，边界16可导入且17拒绝", () => {
   wrap();
   expect(() => parseTemplate(raw())).toThrow("深度");
 });
+it("历史null标题保持原样并使用客户端缺省语义", () => {
+  const value = [
+    {
+      blockId: "b",
+      title: null,
+      fields: [
+        {
+          key: "f",
+          label: "f",
+          type: "drawer",
+          panel: { mode: "chips", title: null, options: [{ value: "a", label: "a" }] },
+        },
+      ],
+    },
+  ];
+  expect(parseTemplate(JSON.stringify(value)).blocks).toEqual(value);
+});

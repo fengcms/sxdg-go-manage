@@ -46,7 +46,7 @@ const empty: Template = {
   version: 0,
   blocks: [],
 };
-export default function FormDesigner() {
+const FormDesigner = () => {
   const { id } = useParams();
   const query = useQuery({
     queryKey: ["template-editor", id],
@@ -64,7 +64,8 @@ export default function FormDesigner() {
       </p>
     );
   return <Workspace key={id} initial={id === "new" ? empty : query.data || empty} />;
-}
+};
+export default FormDesigner;
 const Workspace = ({ initial }: { initial: Template }) => {
   const navigate = useNavigate();
   const role = useAuth((s) => s.user?.adminRole);

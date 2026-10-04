@@ -54,6 +54,7 @@ const titles: Record<string, string[]> = {
     "需求管理",
   ],
   finance: [
+    "动态表单",
     "运营总览",
     "订单统计",
     "用户统计",
@@ -65,6 +66,7 @@ const titles: Record<string, string[]> = {
     "需求管理",
   ],
   customer_service: [
+    "动态表单",
     "运营总览",
     "订单统计",
     "用户统计",
@@ -149,14 +151,17 @@ test("内容写入、二次确认和 JSON 预检", async ({ page }) => {
   await page.locator("nav").getByRole("link", { name: "动态表单", exact: true }).click();
   await page.getByRole("button", { name: "新建动态表单" }).click();
   await page.getByLabel("模板名称", { exact: true }).fill("非法模板预检");
+  page.on("dialog", (d) => void d.accept());
+  await page.getByRole("button", { name: "JSON模式", exact: true }).click();
+  await page.getByRole("button", { name: "从JSON导入", exact: true }).click();
   await page
-    .getByLabel("模板 JSON", { exact: true })
+    .getByLabel("待导入JSON")
     .fill(
       '[{"blockId":"a","fields":[{"key":"a","label":"必填选项","type":"single","required":true}]}]',
     );
-  await page.getByRole("button", { name: "核对操作" }).click();
-  await expect(page.getByText(/可保存但无法用于发布/).first()).toBeVisible();
-  await expect(page.getByRole("button", { name: "确认执行" })).toHaveCount(0);
+  await page.getByRole("button", { name: "检查并导入", exact: true }).click();
+  await expect(page.getByText(/风险警告（可确认保存）/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "保存模板", exact: true })).toBeEnabled();
 });
 test("费率精度与信用组合前端拦截", async ({ page }) => {
   await login(page, "super_admin");

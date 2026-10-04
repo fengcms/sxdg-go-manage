@@ -21,7 +21,7 @@ export interface TabGroup {
 }
 export interface Panel {
   mode: "chips" | "tab" | "wheel";
-  title?: string;
+  title?: string | null;
   multiple?: boolean;
   options?: Option[];
   groups?: TabGroup[];
@@ -40,7 +40,7 @@ export interface TemplateField {
 }
 export interface Block {
   blockId: string;
-  title?: string;
+  title?: string | null;
   fields: TemplateField[];
   [key: string]: unknown;
 }
@@ -59,7 +59,7 @@ const wheel = z.looseObject({
 const panel: z.ZodType<Panel> = z.lazy(() =>
   z.looseObject({
     mode: z.enum(["chips", "tab", "wheel"]),
-    title: chars(64).optional(),
+    title: chars(64).nullable().optional(),
     multiple: z.boolean().optional(),
     options: z.array(option).optional(),
     groups: z
@@ -80,7 +80,7 @@ const field = z.looseObject({
 const blocks = z.array(
   z.looseObject({
     blockId: z.string().min(1),
-    title: z.string().optional(),
+    title: z.string().nullable().optional(),
     fields: z.array(field),
   }),
 );
