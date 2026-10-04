@@ -11,6 +11,7 @@ import { navigationFor } from "../config/navigation";
 import { allowed } from "../lib/permission";
 import { useAuth } from "../store/auth";
 
+const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Login = lazy(() => import("../pages/Login"));
 const Layout = lazy(() => import("../layouts/AdminLayout"));
 function Guard() {
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
               </div>
             ),
           },
+          { path: "/dashboard/:kind", element: <Dashboard /> },
           { path: "*", element: <Placeholder /> },
         ],
       },

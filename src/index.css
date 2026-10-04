@@ -552,3 +552,16 @@ pre {
     display: none;
   }
 }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+.stat-number {
+  font-size: 32px;
+  display: block;
+  margin: 18px 0;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+}
