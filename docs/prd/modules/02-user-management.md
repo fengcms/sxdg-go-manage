@@ -1,6 +1,6 @@
 # 模块二：用户管理与资质审核
 
-> 状态：v3（按 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S01/S05 裁决修订：响应示例 camelCase、封禁状态未知态与按钮门禁规则、解封 reason 必填）
+> 状态：v4（按 [review/06-third-round-decisions.md](../review/06-third-round-decisions.md) T01 裁决修订：封禁 DTO 冻结为 `banned`/`banReason`/`bannedAt`，原因/时间取自审计日志最近一次状态动作、解封后置 null、历史缺失不编造；封禁/解封 reason 后端已同步加非空校验；v3 依据 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S01/S05）
 > 创建日期：2026-10-04
 > 后端接口：`/api/v1/admin/users`、`/api/v1/admin/qualifications`
 > 契约权威：[api-integration.md §3](../api-integration.md)
@@ -26,7 +26,7 @@
 | 角色 | 雇主 / 服务者徽标（可多选） |
 | 信用分 | 数值展示 |
 | 注册时间 | `yyyy-MM-dd HH:mm` |
-| 状态 | 以后端返回的 `banned` 字段为准（⏳ 后端任务 #3a 补齐列表字段前，该列可能缺失）。**字段缺失 = 状态「未知」**（灰色徽标），封禁与解封按钮**双双禁用**；`undefined ≠ false`，**禁止把未知当未封禁** |
+| 状态 | 以后端返回的封禁 DTO 为准：`banned: boolean`、`banReason: string | null`、`bannedAt: string | null`（⏳ 后端任务 #3a 补齐列表字段前，该列可能缺失）。**字段缺失 = 状态「未知」**（灰色徽标），封禁与解封按钮**双双禁用**；`undefined ≠ false`，**禁止把未知当未封禁**；`banReason` / `bannedAt` 为 null 时显示「—」，**不编造** |
 | 操作 | 查看 / 封禁或解封 |
 
 > **已删除的列与原因**：
@@ -39,12 +39,13 @@
 - **查看**：跳转 `/users/:id`
 - **封禁 / 解封**：仅 customer_service / super_admin 可操作
   - **前置状态门禁（S05 冻结规则）**：按钮是否可用**仅由服务端 `banned` 字段决定**——`banned=true` 显示「解封」、`banned=false` 显示「封禁」；**字段缺失（undefined/null）= 状态「未知」，封禁与解封按钮双双禁用**。`undefined ≠ false`，禁止把未知态当未封禁处理
-  - 封禁：二次确认弹窗，需填写封禁原因（**reason 必填**）
-  - 解封：二次确认弹窗，需填写解封原因（**reason 必填**，与权限文档「原因必填」一致）
+  - 封禁：二次确认弹窗，需填写封禁原因（**reason 必填**——前端保持必填提示；后端已同步加非空校验，随 #3a/#4a 同批交付）
+  - 解封：二次确认弹窗，需填写解封原因（**reason 必填**，与权限文档「原因必填」一致；后端非空校验同上）
+  - **封禁原因/时间的数据来源语义（T01 冻结）**：`banReason` / `bannedAt` 来自 `admin_audit_logs` **最近一次状态动作**——仅当前 `banned=true` 且最新动作为封禁时，取该记录的 reason 与 createdAt 展示；**解封后两者返回 null**；历史审计缺失时返回 null，展示「—」，**不编造时间**。首期不做「最近解封原因」展示
   - **操作成功后重新拉取服务端状态**（重新请求列表/详情），**不本地翻转按钮与状态徽标**；提交失败则保持原状态并提示
   - 请求体见 §4（`{ banned, reason }`，**合同红线，见下**）
 
-> **开发依赖（S05，独立 P0）**：封禁/解封功能依赖后端任务 **#3a（用户列表 `banned` 字段，列表操作入口的状态依据）** + **#4a（用户详情 `banned` 字段，详情操作入口的状态依据）**，两项均为独立 P0 任务。字段就绪前列表/详情的封禁入口按「未知态 + 按钮禁用」交付，不伪装可用。
+> **开发依赖（S05，独立 P0）**：封禁/解封功能依赖后端任务 **#3a（用户列表封禁 DTO，列表操作入口的状态依据）** + **#4a（用户详情封禁 DTO，详情操作入口的状态依据）**，两项均为独立 P0 任务（**T01 契约已冻结**：DTO = `banned: boolean`、`banReason: string | null`、`bannedAt: string | null`；原因/时间读审计日志最近一次状态动作，后端批量查询、禁止逐用户 N+1）。字段就绪前列表/详情的封禁入口按「未知态 + 按钮禁用」交付，不伪装可用。
 
 ---
 
@@ -58,7 +59,9 @@
 | 用户 ID | |
 | 角色 | 雇主 / 服务者 / 管理员 |
 | 信用分 | 大字号显示 |
-| 状态 | 以后端返回的 `banned` 字段为准（⏳ 后端任务 #4a 补齐详情字段前可能缺失）。**字段缺失 = 状态「未知」**（灰色徽标），详情页封禁/解封按钮**双双禁用**；`undefined ≠ false`，禁止把未知当未封禁 |
+| 状态 | 以后端返回的封禁 DTO 为准：`banned: boolean`、`banReason: string | null`、`bannedAt: string | null`（⏳ 后端任务 #4a 补齐详情字段前可能缺失）。**字段缺失 = 状态「未知」**（灰色徽标），详情页封禁/解封按钮**双双禁用**；`undefined ≠ false`，禁止把未知当未封禁 |
+| 封禁原因 | `banReason`，null 显示「—」，**不编造**（来源语义见 §1.3：审计日志最近一次状态动作） |
+| 封禁时间 | `bannedAt`，null 显示「—」，**不编造** |
 | 注册时间 | |
 | 最后登录时间 | |
 
@@ -191,7 +194,7 @@ const useCertImage = (fileId: string | null) => {
 
 ---
 
-## 4. 后端接口契约（对齐 api-integration.md v2）
+## 4. 后端接口契约（对齐 api-integration.md v4）
 
 ### GET /api/v1/admin/users
 
@@ -218,15 +221,15 @@ const useCertImage = (fileId: string | null) => {
 }
 ```
 
-> ⚠️ **字段命名（S01 修正）**：用户模型真实序列化为 **camelCase**（`avatarUrl` / `isEmployer` / `isProvider` / `isAdmin` / `creditScore` / `createdAt`），**不是** `avatar_url` / `is_employer` 等数据库命名——按 snake_case 绑定会渲染出空列。响应分页固定 `{items, total, page, pageSize}`（camelCase）。无 `phone_masked`、无 `completed_orders`、无封禁状态字段（任务单 #3a 待补）。
+> ⚠️ **字段命名（S01 修正）**：用户模型真实序列化为 **camelCase**（`avatarUrl` / `isEmployer` / `isProvider` / `isAdmin` / `creditScore` / `createdAt`），**不是** `avatar_url` / `is_employer` 等数据库命名——按 snake_case 绑定会渲染出空列。响应分页固定 `{items, total, page, pageSize}`（camelCase）。无 `phone_masked`、无 `completed_orders`；封禁 DTO（`banned` / `banReason` / `bannedAt`）⏳ 任务单 #3a 补齐（**T01 契约已冻结**：原因/时间读审计日志最近一次状态动作，缺失为 null 不编造）。
 
 ### GET /api/v1/admin/users/:id
 
-**Response data**：用户单行模型（不自动 join 交易汇总、信用记录、发布内容）。
+**Response data**：用户单行模型（不自动 join 交易汇总、信用记录、发布内容）。封禁 DTO（`banned: boolean`、`banReason: string | null`、`bannedAt: string | null`）⏳ 任务单 #4a 补齐，契约与 #3a 同批冻结（见 §1.3 数据来源语义）。
 
 ### PUT /api/v1/admin/users/:id/status（封禁/解封）
 
-**Body**：`{ "banned": true, "reason": "违规行为" }` / `{ "banned": false, "reason": "申诉通过" }`（**封禁与解封的 reason 均必填**）
+**Body**：`{ "banned": true, "reason": "违规行为" }` / `{ "banned": false, "reason": "申诉通过" }`（**封禁与解封的 reason 均必填**——前端保持必填提示；后端已同步加非空校验，随 #3a/#4a 同批交付）
 
 > ⚠️ **合同红线**：`banned` 是**布尔值**，不是状态字符串枚举。若误按旧的字符串状态字段方式绑定，后端解析到未知字段时 `banned` 保持零值 false，**会把「封禁」执行成「解封」**。前端类型必须显式声明 `banned: boolean`，禁止任何字符串到布尔的隐式转换。
 

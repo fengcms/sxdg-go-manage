@@ -1,6 +1,6 @@
 # 前后端接口对接清单（合同版）
 
-> 状态：v3（按 [review/04-second-round-decisions.md](./review/04-second-round-decisions.md) S01/S02/S04/S08/S09 裁决同步修订：命名约定改「逐接口 DTO 为准」、表单模板 DSL 修正、客服 cs/me 契约与阅读权、看板口径、服务费精度冻结）
+> 状态：v4（按 [review/06-third-round-decisions.md](./review/06-third-round-decisions.md) T02/T04/T06 裁决同步修订：看板缺口改「密码与短信登录暂不计入」、客服转接权服务端化与 cs/me 补 isActive、分类删除冻结「引用存在即拒绝」；v3 依据 [review/04-second-round-decisions.md](./review/04-second-round-decisions.md) S01/S02/S04/S08/S09）
 > 日期：2026-10-04
 > 权威性：本文是管理后台前端对接的**唯一合同**。与《管理后台前端技术栈与UI风格指导.md》冲突时，以本文为准。
 > 后端待补接口见 [sxdg-be/docs/review/admin-backend-supplement-tasks.md](../../../sxdg-be/docs/review/admin-backend-supplement-tasks.md)（标注 ⏳ 的接口）。
@@ -93,13 +93,13 @@
 
 | 方法 | 路径 | 响应数组元素字段（真实口径） |
 |------|------|------------------------------|
-| GET | `/api/v1/admin/dashboard/overview` | `users`（用户总数）、`orders`（订单总数）、`service_gmv`（**已支付订单金额合计**，非已完成）、`active_users`（**按已记录 `last_login_at` 统计的近 24 小时登录用户数**——用户行数，非登录次数；非自然日 DAU；**密码登录暂不计入**，后端任务 #10 修复后覆盖） |
+| GET | `/api/v1/admin/dashboard/overview` | `users`（用户总数）、`orders`（订单总数）、`service_gmv`（**已支付订单金额合计**，非已完成）、`active_users`（**按已记录 `last_login_at` 统计的近 24 小时登录用户数**——用户行数，非登录次数；非自然日 DAU；**密码与短信登录暂不计入**，后端任务 #10 修复后覆盖） |
 | GET | `/api/v1/admin/dashboard/orders` | `status`、`count`、`amount`（按状态分组） |
 | GET | `/api/v1/admin/dashboard/users` | `date`、`new_users`、`active_users`（按注册日期分组；`active_users` = **该注册日期用户群中的近期活跃人数**，**每组 `active_users` ≤ `new_users`**） |
 | GET | `/api/v1/admin/dashboard/finance` | `settled`、`fees`、`refunded`、`withdrawn`、`available_balance`、`frozen_balance` |
 
 > 四个接口均返回**数组**，不接受日期/来源筛选。趋势图、日期筛选、自然日口径为二期（后端任务单 #2）。前端禁止将缺失指标补 0。
-> **S08 口径补充**：`active_users` 统计的是 `last_login_at` 落在近 24h 的**用户行数**（同一用户多次登录不重复计数）；users 序列的 `active_users` 是注册日期分组内的活跃人数（≤ 该组 `new_users`），**不能当全平台 DAU 趋势使用**。密码登录当前不更新 `last_login_at`（⏳ 后端任务 #10 缺陷修复），修复前该指标不含密码登录用户。
+> **S08/T04 口径补充**：`active_users` 统计的是 `last_login_at` 落在近 24h 的**用户行数**（同一用户多次登录不重复计数）；users 序列的 `active_users` 是注册日期分组内的活跃人数（≤ 该组 `new_users`），**不能当全平台 DAU 趋势使用**。**密码与短信登录均不更新 `last_login_at`**（⏳ 后端任务 #10 改为「**统一登录时间维护（三入口）**」：有效登录 = 凭据校验通过**且封禁检查通过后**刷新 `last_login_at`；微信登录现有更新发生在封禁检查之前，时机一并修正），修复前该指标不含密码与短信登录用户。
 
 ---
 
@@ -133,7 +133,7 @@
 | GET | `/api/v1/admin/categories` | Query: `page`、`page_size` | **分页平铺列表**（非树），前端拉全部分页后按 **`parentId`**（camelCase）构树 |
 | POST | `/api/v1/admin/categories` | Body: 分类对象 | 创建（最多三级，名称 ≤32 字） |
 | PUT | `/api/v1/admin/categories/:id` | Body: 分类对象 | 更新 |
-| DELETE | `/api/v1/admin/categories/:id` | — | 删除（后端当前仅检查子分类，引用检查 ⏳ 任务单 #7） |
+| DELETE | `/api/v1/admin/categories/:id` | — | 删除（**T06 冻结：引用存在即拒绝删除**，引用检查覆盖**全部状态**含历史已下架/已关闭记录；⏳ 任务单 #7 补 Service/Requirement 引用检查） |
 | GET | `/api/v1/admin/featured-categories` | — | 热门聚合入口列表 |
 | POST | `/api/v1/admin/featured-categories` | Body: `{ name, categoryIds: [...], sortOrder, isActive? }` | 创建聚合入口（**categoryIds 是数组**） |
 | DELETE | `/api/v1/admin/featured-categories/:id` | — | 删除 |
@@ -244,17 +244,17 @@
 
 | 方法 | 路径 | 请求 | 说明 |
 |------|------|------|------|
-| GET | `/api/v1/admin/cs/me` ⏳ | — | **当前客服身份查询（后端任务单 #6a）**：已绑定 → 200 + `{ agentId, isOnline, displayName }`；未绑定 → 200 + `{ agent: null }`（前端引导「当前账号未绑定客服」）；角色范围 = 客服账号 + super_admin |
+| GET | `/api/v1/admin/cs/me` ⏳ | — | **当前客服身份查询（后端任务单 #6a，T02 契约已冻结）**：已绑定 → 200 + `{ agentId, isOnline, displayName, isActive }`（isActive 区分「已停用但仍有绑定」；停用客服不能上线/接待）；未绑定 → 200 + `{ agent: null }`（普通客服展示绑定引导；**未绑定 super_admin 仍可查看全量会话元信息**，不做本人上线/接待动作）；角色范围 = 客服账号 + super_admin |
 | GET | `/api/v1/admin/cs/agents` ⏳ | Query: `page`、`page_size` | 客服列表（**后端无此路由，任务单 #6a**） |
 | POST | `/api/v1/admin/cs/agents` | Body: 客服配置（写 cs_agents 配置，**不设置用户 isAdmin**） | 仅 super_admin |
-| POST | `/api/v1/admin/cs/agents/:id/status` | Body: `{ isOnline }` | 切换在线状态 |
-| GET | `/api/v1/admin/cs/agents/online` ⏳ | — | 可转接目标查询（**任务单 #6a**） |
-| GET | `/api/v1/admin/cs/sessions` | Query: `page`、`page_size` | 会话列表（列表管理权：super_admin 全部 / 客服本人）；**单行模型无用户昵称/头像——用户摘要（昵称/头像）⏳ #6a 会话摘要 DTO（join users），就绪前仅展示用户 ID**；**无搜索参数** |
-| POST | `/api/v1/admin/cs/sessions/:conv_id/transfer` | Body: `{ toAgentId }` | **值为 cs_agents.id，不是 users.id**；**转接权仅客服本人** |
+| POST | `/api/v1/admin/cs/agents/:id/status` | Body: `{ isOnline }` | 切换在线状态（仅限本人绑定的 agent；停用客服不能上线） |
+| GET | `/api/v1/admin/cs/agents/online` ⏳ | — | 可转接目标查询（**任务单 #6a**）：在线且启用；角色 = customer_service / super_admin；**容量由后端转接事务再次校验**（列表过滤仅为展示优化） |
+| GET | `/api/v1/admin/cs/sessions` | Query: `page`、`page_size` | 会话列表（列表管理权：super_admin 全部 / 客服本人）；**单行模型无用户昵称/头像——用户摘要（昵称/头像）⏳ #6a 会话摘要 DTO（join users），就绪前仅展示用户 ID**；**DTO 保留 `user1Id`/`user2Id` 供前端判断阅读资格**；**无搜索参数** |
+| POST | `/api/v1/admin/cs/sessions/:conv_id/transfer` | Body: `{ toAgentId }` | **值为 cs_agents.id，不是 users.id**；**转接权仅当前接待人（后端服务实现，所有角色无豁免）**：super_admin 本人正在接待可转、非本人不得代转；容量由转接事务再次校验 |
 | GET | `/api/v1/conversations/:id/messages` | Query: `page`、`page_size` | 历史消息（**消息阅读权 = 严格会话参与方，super_admin 不例外，无全会话豁免**）；数据为**已入库消息记录**（本地 chat_messages：系统卡片 + 活动文本），完整腾讯 IM 历史随 #6b |
 
 **首期范围（冻结）**：
-- **授权三分（S04）**：列表管理权（super_admin 看全部、客服看本人）/ 转接权（仅客服本人）/ 消息阅读权（**严格参与方，super_admin 不例外**）。super_admin 在列表点开非本人参与会话时，**前端不发消息读取请求**，展示「仅参与方可查看历史消息」占位
+- **授权三分（S04，T02 升级）**：列表管理权（super_admin 看全部、客服看本人）/ 转接权（仅当前接待人，**后端校验 `conversation.user2Id == 当前用户 ID`，所有角色无豁免**）/ 消息阅读权（**严格参与方，super_admin 不例外**）。super_admin 在列表点开非本人参与会话时，**前端不发消息读取请求**，展示「仅参与方可查看历史消息」占位；**未绑定的 super_admin 仍可查看全量会话元信息**，但不能执行本人上线/接待动作、不能读取非参与消息；未绑定的普通客服展示绑定引导
 - 做接待列表、会话流转、历史消息查看（已入库消息记录）；**无会话搜索**（服务端无参数支持）
 - IM 发送链路（腾讯 IM 签名、身份映射、订单卡片协议、普通客服消息落库与 IM 全量历史）为独立后端任务（任务单 #6b），闭合前**不宣称聊天全流程完成**
 - 客服账号准备走受控运维（seed / 初始化命令指定 admin_role），页面不做开户；POST agents 只是配置绑定，不是提权

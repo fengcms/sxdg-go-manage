@@ -1,6 +1,6 @@
 # 模块五：客服管理
 
-> 状态：v3（按 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S04 裁决修订：权限三分（列表管理/转接/消息阅读）、super_admin 非参与会话不发请求、补 cs/me 契约（#6a）、删除会话搜索、历史消息标注「已入库消息记录」）
+> 状态：v4（按 [review/06-third-round-decisions.md](../review/06-third-round-decisions.md) T02 裁决修订：转接权改后端服务实现（移除 super_admin 代转豁免）、修正未绑定 super_admin 语义（仍可查看全量会话元信息）、cs/me 补 `isActive`、online 目标接口角色与容量二次校验、会话列表保留 `user1Id`/`user2Id`；v3 依据 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S04）
 > 创建日期：2026-10-04
 > 后端接口：`/api/v1/admin/cs/agents`、`/api/v1/admin/cs/sessions`、`/api/v1/admin/cs/me`（⏳ #6a）
 > 契约权威：[api-integration.md §9](../api-integration.md)
@@ -14,10 +14,14 @@
 | 权力 | 范围 | 说明 |
 |------|------|------|
 | **列表管理权** | super_admin 看全部 cs 会话；客服仅看本人接待的会话 | 后端 `adminRead` 仅对非 super_admin 加当前客服过滤；列表可见 ≠ 消息可读 |
-| **转接权** | **仅客服本人**（自己接待中的会话） | super_admin 不代客转接 |
+| **转接权** | **仅当前接待人**（自己接待中的会话） | **后端服务实现（T02 冻结，#6a 移除 super_admin 豁免）**：所有角色必须满足 `conversation.user2Id == 当前用户 ID` 才可转接，**非仅前端隐藏按钮**；super_admin 本人正在接待可转，**非本人不得代转** |
 | **消息阅读权** | **严格会话参与方（user1Id / user2Id），super_admin 不例外** | 后端 `service.Conversation` 对读取消息严格校验参与方，**无全会话豁免** |
 
 **super_admin 查看非本人参与会话的规则（前端冻结）**：super_admin 在列表中点开**非本人参与**的会话时，**前端不发送任何消息读取请求**（后端必拒），右侧展示占位文案「**仅参与方可查看历史消息**」；列表管理操作（查看会话元信息）不受影响。
+
+**未绑定 agent 的账号语义（T02 冻结，修正旧表述）**：
+- **未绑定的 super_admin**：**仍可查看全量会话元信息**（列表管理权不受影响）——**不是「不进入工作台」**；但不能执行**本人上线/接待动作**，也**不能读取非参与消息**
+- **未绑定的普通客服**：展示绑定引导「当前账号未绑定客服」，不提供上线/接待操作
 
 若未来需要监督查阅能力，须另设最小范围、可审计的后台消息权限（另立任务，本期不做）。
 
@@ -68,9 +72,11 @@
 
 **当前客服身份查询（S04 契约冻结，⏳ 后端任务 #6a）**：客服工作台初始化时调用 `GET /api/v1/admin/cs/me` 获取当前账号绑定的客服身份（普通客服看不到仅 super_admin 可读的 agents 列表，**此接口是取得自己 agentId 与在线状态的唯一入口**）：
 
-- 已绑定客服，返回 200：`{ "agentId": 5, "isOnline": true, "displayName": "客服小王" }`
-- 当前账号**未绑定客服**，返回 200：`{ "agent": null }`——前端据此展示引导态「**当前账号未绑定客服**」（不进入工作台、不发会话/转接请求，不误报为接口错误）
-- 角色范围：客服账号 + super_admin（super_admin 未绑定时同样展示引导态）
+- 已绑定客服，返回 200：`{ "agentId": 5, "isOnline": true, "displayName": "客服小王", "isActive": true }`——**v4 补 `isActive`**（区分「已停用但仍有绑定」的客服）；**`isActive=false`（停用）的客服不能上线/接待**，前端禁用上线开关与接待动作
+- 当前账号**未绑定客服**，返回 200：`{ "agent": null }`——前端据此区分角色展示（不误报为接口错误）：
+  - **普通客服**：展示引导态「**当前账号未绑定客服**」，不提供上线/接待操作
+  - **super_admin**：**仍可查看全量会话元信息**（列表管理权，见 §0），但不执行本人上线/接待动作、不读取非参与消息——**不再是「不进入工作台」**
+- 角色范围：客服账号 + super_admin
 - **#6a 就绪前**：该查询不可用，工作台显示「待后端支持」占位，不伪造身份数据
 
 ---
@@ -104,7 +110,7 @@
 
 | 项 | 说明 | 数据来源 |
 |----|------|---------|
-| 用户 | **首期仅展示用户 ID**（点击跳用户详情） | ✅ 会话单行模型已有（`user1Id` / `user2Id` 中的用户侧 ID）；昵称/头像 ⏳ **#6a 会话摘要 DTO**（join users）就绪前不展示，不猜值 |
+| 用户 | **首期仅展示用户 ID**（点击跳用户详情） | ✅ 会话单行模型已有（`user1Id` / `user2Id` 中的用户侧 ID）；昵称/头像 ⏳ **#6a 会话摘要 DTO**（join users）就绪前不展示，不猜值；**DTO 保留 `user1Id` / `user2Id`**（T02），前端据此判断当前账号的阅读资格（是否为会话参与方） |
 | 最后消息预览 | 截断显示 | ✅ 已有（`lastMessage`） |
 | 最后消息时间 | | ✅ 已有（`lastMessageAt`） |
 | 关联订单 | 如有订单关联，显示「订单 #ID」标签（跳订单详情） | ✅ 已有（`orderId`，仅 ID 无订单号文本） |
@@ -120,8 +126,8 @@
 
 ### 2.4 会话流转
 
-- 右上角「流转」按钮，打开客服选择下拉，将会话转给其他客服；**转接权仅限客服本人**（自己接待中的会话，见 §0 三权分立）
-- **可转接目标** = 在线且启用的客服，依赖 `GET /api/v1/admin/cs/agents/online`（⏳ 后端任务单 #6a，补齐前流转功能不可用）
+- 右上角「流转」按钮，打开客服选择下拉，将会话转给其他客服；**转接权仅限当前接待人**——**后端服务实现（T02 冻结）**：所有角色必须满足 `conversation.user2Id == 当前用户 ID`（见 §0 三权分立）；super_admin 本人正在接待可转，**非本人不得代转**（前端隐藏按钮只是展示层，权限以后端校验为准）
+- **可转接目标** = 在线且启用的客服，依赖 `GET /api/v1/admin/cs/agents/online`（⏳ 后端任务单 #6a，补齐前流转功能不可用）；接口角色 = **customer_service + super_admin**；**容量由后端转接事务再次校验**（列表过滤仅为展示优化，前端不得把列表可见当作容量授权依据）
 - 接口：`POST /api/v1/admin/cs/sessions/:conv_id/transfer`，Body：`{ "toAgentId": 5 }`
 - ⚠️ **`toAgentId` 的值是 `cs_agents.id`（agent ID），不是 `users.id`（user ID）**——两者是不同标识，传错会转接失败或转错人
 - 转接成功后旧客服立即停止该会话的消息请求并清除当前时间线（失权），新客服可读
@@ -143,17 +149,17 @@
 
 ---
 
-## 4. 后端接口契约摘要（对齐 api-integration.md v2）
+## 4. 后端接口契约摘要（对齐 api-integration.md v4）
 
 | 方法 | 路径 | 请求 | 说明 | 权限 |
 |------|------|------|------|------|
-| GET | `/api/v1/admin/cs/me` | — | 当前客服身份查询（⏳ **任务单 #6a**）：已绑定 → `{ agentId, isOnline, displayName }`；未绑定 → `{ agent: null }`（前端引导「当前账号未绑定客服」） | 客服账号 / super_admin |
+| GET | `/api/v1/admin/cs/me` | — | 当前客服身份查询（⏳ **任务单 #6a，T02 契约已冻结**）：已绑定 → `{ agentId, isOnline, displayName, isActive }`（isActive 区分「已停用但仍有绑定」；停用客服不能上线/接待）；未绑定 → `{ agent: null }`（普通客服展示绑定引导；未绑定 super_admin 仍可查看会话元信息，见 §1.3） | 客服账号 / super_admin |
 | GET | `/api/v1/admin/cs/agents` | Query: `page`、`page_size` | 客服列表（⏳ **后端无此路由，任务单 #6a**） | super_admin |
 | POST | `/api/v1/admin/cs/agents` | Body: 客服配置 | **写 cs_agents 配置，不设置用户 isAdmin，不是提权接口** | super_admin |
-| POST | `/api/v1/admin/cs/agents/:id/status` | Body: `{ isOnline }` | 切换在线状态 | customer_service / super_admin |
-| GET | `/api/v1/admin/cs/agents/online` | — | 可转接目标查询（⏳ 任务单 #6a） | customer_service / super_admin |
-| GET | `/api/v1/admin/cs/sessions` | Query: `page`、`page_size` | 会话列表（列表管理权：super_admin 全部 / 客服本人）；**单行模型无用户昵称头像**，用户摘要 ⏳ #6a 会话摘要 DTO（就绪前仅展示用户 ID）；**无搜索参数** | customer_service / super_admin |
-| POST | `/api/v1/admin/cs/sessions/:conv_id/transfer` | Body: `{ toAgentId }` | **值为 cs_agents.id，不是 users.id**；**转接权仅客服本人** | customer_service（本人会话） |
+| POST | `/api/v1/admin/cs/agents/:id/status` | Body: `{ isOnline }` | 切换在线状态（**仅限本人绑定的 agent**；停用客服不能上线） | customer_service / super_admin |
+| GET | `/api/v1/admin/cs/agents/online` | — | 可转接目标查询（⏳ 任务单 #6a）：在线且启用；**容量由后端转接事务再次校验**（列表过滤仅为展示优化） | customer_service / super_admin |
+| GET | `/api/v1/admin/cs/sessions` | Query: `page`、`page_size` | 会话列表（列表管理权：super_admin 全部 / 客服本人）；**单行模型无用户昵称头像**，用户摘要 ⏳ #6a 会话摘要 DTO（就绪前仅展示用户 ID）；**DTO 保留 `user1Id`/`user2Id` 供前端判断阅读资格**；**无搜索参数** | customer_service / super_admin |
+| POST | `/api/v1/admin/cs/sessions/:conv_id/transfer` | Body: `{ toAgentId }` | **值为 cs_agents.id，不是 users.id**；**转接权仅当前接待人（后端服务实现）**：所有角色须满足 `conversation.user2Id == 当前用户 ID`，super_admin 本人接待可转、非本人不得代转；容量由转接事务再次校验 | customer_service / super_admin（均限本人接待中的会话） |
 | GET | `/api/v1/conversations/:id/messages` | Query: `page`、`page_size` | **已入库消息记录**（本地 chat_messages：系统卡片 + 活动文本；完整腾讯 IM 历史随 #6b）；**消息阅读权 = 严格会话参与方，super_admin 不例外，无全会话豁免** | 会话参与方 |
 
 > `conversations` / `messages` 接口复用用户端消息中心接口，**按会话参与方授权（super_admin 不例外），客服角色无全用户会话豁免**（旧文档该设定已作废）。列表管理权（super_admin 看全部）**不等于**消息阅读权，见 §0 三权分立。

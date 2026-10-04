@@ -109,7 +109,7 @@
 
 ---
 
-## 4. 后端接口契约摘要（对齐 api-integration.md v2）
+## 4. 后端接口契约摘要（对齐 api-integration.md，以后端任务单 #9 审计标准化为二期演进方向）
 
 ### GET /api/v1/admin/audit-logs
 

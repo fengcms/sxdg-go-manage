@@ -1,6 +1,6 @@
 # 模块三：内容管理
 
-> 状态：v3（按 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S01/S02 裁决修订：构树键 parentId、DSL 删除 panel 独立 type、补 panel 嵌套结构与完整创建示例、两套校验说明）
+> 状态：v4（按 [review/06-third-round-decisions.md](../review/06-third-round-decisions.md) T06 裁决修订：分类删除语义冻结「**引用存在即拒绝删除**」（引用检查覆盖全部状态，含历史已下架/已关闭记录）、**维持平铺分页构树、不提供树接口**；v3 依据 [review/04-second-round-decisions.md](../review/04-second-round-decisions.md) S01/S02）
 > 创建日期：2026-10-04
 > 后端接口：`/api/v1/admin/categories`、`/featured-categories`、`/form-templates`、`/banners`、`/service-badges`
 > 契约权威：[api-integration.md §4/§5/§10/§13](../api-integration.md)
@@ -47,6 +47,8 @@
 2. 在前端按 **`parentId`**（camelCase，后端 `categories.go` 真实序列化；**不是 `parent_id`**）组装三级树
 3. **禁止只用第一页数据构树**（会静默丢分类）
 
+> **后端不提供分类树接口（T06 冻结）**：`GET /categories` 维持平铺分页构树方案，**不新增树接口**；总数上限由 OpenAPI 标注。
+
 ### 1.4 分类字段
 
 | 字段 | 说明 |
@@ -61,7 +63,8 @@
 ### 1.5 删除规则
 
 - 后端当前仅检查**是否存在子分类**，有子分类时禁止删除，提示「请先删除子分类」
-- **Service / Requirement 引用检查后端暂未实现**（⏳ 后端任务单 #7）；补齐前前端**不做「已引用不可删」的承诺**，删除按钮保留**二次确认**，确认文案提示「该分类可能仍被服务/需求引用，删除后不可恢复」
+- **引用存在即拒绝删除（T06 冻结语义）**：Service / Requirement 引用检查由后端任务单 #7 补齐；**引用检查覆盖全部状态**——含历史**已下架 / 已关闭**记录，不因页面隐藏而漏查；被引用的分类**直接拒绝删除**，提示「该分类仍被服务/需求引用，不可删除」
+- #7 引用检查落地前，前端**不做「已引用不可删」的承诺**，删除按钮保留**二次确认**，确认文案提示「该分类可能仍被服务/需求引用，删除后不可恢复」（删除结果以后端实际校验为准）
 
 ---
 
@@ -331,7 +334,7 @@
 
 ---
 
-## 6. 后端接口契约摘要（对齐 api-integration.md v2）
+## 6. 后端接口契约摘要（对齐 api-integration.md v4）
 
 ### 分类
 
@@ -340,7 +343,7 @@
 | GET | `/api/v1/admin/categories` | **分页平铺列表**（非树），前端拉全部分页后构树 |
 | POST | `/api/v1/admin/categories` | 创建（最多三级，名称 ≤32 字） |
 | PUT | `/api/v1/admin/categories/:id` | 更新 |
-| DELETE | `/api/v1/admin/categories/:id` | 删除（后端当前仅检查子分类；引用检查 ⏳ 任务单 #7） |
+| DELETE | `/api/v1/admin/categories/:id` | 删除（后端当前仅检查子分类；**T06 冻结：引用存在即拒绝删除**，引用检查覆盖**全部状态**（含历史已下架/已关闭记录），⏳ 任务单 #7 补齐） |
 
 ### 热门分类
 
