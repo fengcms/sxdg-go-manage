@@ -14,6 +14,7 @@ import { useAuth } from "../store/auth";
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Users = lazy(() => import("../pages/Users"));
 const Qualifications = lazy(() => import("../pages/Qualifications"));
+const Content = lazy(() => import("../pages/Content"));
 const Login = lazy(() => import("../pages/Login"));
 const Layout = lazy(() => import("../layouts/AdminLayout"));
 function Guard() {
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
           { path: "/users/qualifications", element: <Qualifications /> },
           { path: "/users", element: <Users /> },
           { path: "/users/:id", element: <Users /> },
+          { path: "/content/:kind", element: <Content /> },
           { path: "*", element: <Placeholder /> },
         ],
       },

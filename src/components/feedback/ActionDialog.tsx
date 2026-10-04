@@ -1,3 +1,5 @@
+import { TemplatePreview } from "../form/TemplatePreview";
+import { UploadInput } from "../form/UploadInput";
 // 写操作先校验再二次确认，失败保留输入，完成后刷新服务端状态。
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +14,16 @@ import { Button, Input, Modal, Select, Textarea } from "../ui";
 export interface FieldSpec {
   key: string;
   label: string;
-  type?: "text" | "number" | "textarea" | "select" | "checkbox" | "datetime-local";
+  type?:
+    | "text"
+    | "number"
+    | "textarea"
+    | "select"
+    | "checkbox"
+    | "datetime-local"
+    | "image"
+    | "json"
+    | "multi";
   options?: { value: string; label: string }[];
   description?: string;
   default?: string;
@@ -161,6 +172,53 @@ function ActionInput({
   field: FieldSpec;
   register: ReturnType<typeof useForm<Record<string, string>>>["register"];
 }) {
+  const [current, setCurrent] = useState(f.default || "");
+  const update = (value: string) => {
+    setCurrent(value);
+    void register(f.key).onChange({ target: { name: f.key, value } });
+  };
+  if (f.type === "image")
+    return (
+      <UploadInput
+        id={`action-${f.key}`}
+        value={current}
+        onChange={update}
+        biz={f.key === "iconUrl" ? "category" : "banner"}
+      />
+    );
+  if (f.type === "multi")
+    return (
+      <Select
+        id={`action-${f.key}`}
+        multiple
+        value={current.split(",").filter(Boolean)}
+        onChange={(e) =>
+          update(
+            Array.from(e.target.selectedOptions)
+              .map((o) => o.value)
+              .join(","),
+          )
+        }
+      >
+        {f.options?.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </Select>
+    );
+  if (f.type === "json")
+    return (
+      <>
+        <Textarea
+          id={`action-${f.key}`}
+          rows={12}
+          value={current}
+          onChange={(e) => update(e.target.value)}
+        />
+        <TemplatePreview raw={current} />
+      </>
+    );
   const props = { id: `action-${f.key}`, ...register(f.key) };
   if (f.type === "textarea") return <Textarea {...props} />;
   if (f.type === "select")

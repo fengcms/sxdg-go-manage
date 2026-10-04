@@ -573,3 +573,24 @@ pre {
   display: block;
   margin: 20px auto;
 }
+
+.upload-preview {
+  width: 180px;
+  max-height: 120px;
+  object-fit: contain;
+  margin: 10px 0;
+}
+.template-preview {
+  padding: 20px;
+  background: var(--background);
+  border-radius: 10px;
+  margin-top: 15px;
+}
+.template-preview fieldset {
+  border: 1px solid var(--border);
+  padding: 15px;
+  margin: 12px 0;
+}
+.control[multiple] {
+  min-height: 120px;
+}
