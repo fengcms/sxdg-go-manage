@@ -49,3 +49,85 @@ it("合法嵌套滚轮可预览", () =>
       ]),
     ).warnings,
   ).toEqual([]));
+it("真实分组滚轮无需type，扩展展示属性无损保留", () => {
+  const value = [
+    {
+      blockId: "b",
+      title: "区块",
+      extra: false,
+      fields: [
+        {
+          key: "f",
+          label: "字段",
+          type: "drawer",
+          placeholder: "选择",
+          panel: {
+            mode: "tab",
+            title: "标题",
+            groups: [
+              {
+                key: "age",
+                label: "年龄",
+                panel: {
+                  mode: "wheel",
+                  wheels: [
+                    {
+                      key: "age",
+                      options: [{ value: "1", label: "一", disabled: false }],
+                      defaultValue: "1",
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ];
+  expect(parseTemplate(JSON.stringify(value)).blocks).toEqual(value);
+});
+it("标题按Unicode码点校验且局部标识可跨面板重复", () => {
+  const data = (title: string) =>
+    JSON.stringify([
+      {
+        blockId: "b",
+        fields: [
+          {
+            key: "f",
+            label: "f",
+            type: "wheel",
+            panel: {
+              mode: "wheel",
+              title,
+              wheels: [{ key: "f", options: [{ value: "a", label: "a" }] }],
+            },
+          },
+        ],
+      },
+    ]);
+  expect(() => parseTemplate(data("😀".repeat(64)))).not.toThrow();
+  expect(() => parseTemplate(data("😀".repeat(65)))).toThrow();
+});
+it("重复局部滚轮和选项拒绝并提供结构路径", () => {
+  const data = [
+    {
+      blockId: "b",
+      fields: [
+        {
+          key: "f",
+          label: "f",
+          type: "wheel",
+          panel: {
+            mode: "wheel",
+            wheels: [
+              { key: "a", options: [] },
+              { key: "a", options: [] },
+            ],
+          },
+        },
+      ],
+    },
+  ];
+  expect(() => parseTemplate(JSON.stringify(data))).toThrow("wheels");
+});

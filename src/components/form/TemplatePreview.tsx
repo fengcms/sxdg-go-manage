@@ -76,7 +76,15 @@ function PreviewField({ field: f, prefix }: { field: TemplateField; prefix: stri
       ) : (
         <div id={id}>
           {(p?.mode === "wheel" ? p.wheels : p?.groups)?.map((child) => (
-            <PreviewField key={child.key} field={child} prefix={id} />
+            <PreviewField
+              key={child.key}
+              field={{
+                ...child,
+                label: child.label ?? child.key,
+                type: "panel" in child ? "drawer" : "single",
+              }}
+              prefix={id}
+            />
           ))}
         </div>
       )}
