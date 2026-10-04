@@ -267,6 +267,13 @@ function AuditLogs() {
       <ResourceList<Audit>
         kind="audit-logs"
         title="操作日志"
+        filters={[
+          { key: "admin_id", label: "管理员ID" },
+          { key: "action", label: "操作标识" },
+          { key: "target_type", label: "对象类型" },
+          { key: "start_date", label: "起始日", type: "date" },
+          { key: "end_date", label: "结束日", type: "date" },
+        ]}
         description="HTTP 管理写操作审计；CLI 初始化记录在独立运维日志中"
         columns={[
           { key: "id", label: "编号", render: (r) => r.id },

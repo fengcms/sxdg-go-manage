@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { adminPath, useDetail } from "../api/admin";
 import { ResourceList } from "../components/data/ResourceList";
+import { UserResources } from "../components/data/UserResources";
 import { ActionDialog, type ActionSpec } from "../components/feedback/ActionDialog";
 import { Details } from "../components/feedback/Details";
 import { State } from "../components/feedback/State";
@@ -92,6 +93,8 @@ export default function Users() {
                     ["用户 ID", detail.data.id],
                     ["昵称", detail.data.nickname],
                     ["信用分", detail.data.creditScore],
+                    ["脱敏手机号", text(detail.data.phoneMasked)],
+                    ["完成订单数", text(detail.data.completedOrders)],
                     [
                       "交易身份",
                       [detail.data.isEmployer ? "雇主" : "", detail.data.isProvider ? "服务者" : ""]
@@ -116,13 +119,34 @@ export default function Users() {
             )}
           </State>
           <Qualifications userId={Number(id)} />
+          <UserResources id={Number(id)} />
         </>
       ) : (
         <ResourceList<User>
           kind="users"
           title="用户管理"
           description="查看用户资料，维护平台信用与使用秩序"
-          filters={[{ key: "keyword", label: "昵称关键词" }]}
+          filters={[
+            { key: "keyword", label: "昵称 / 完整手机号" },
+            {
+              key: "banned",
+              label: "封禁状态",
+              options: [
+                { value: "true", label: "已封禁" },
+                { value: "false", label: "正常" },
+              ],
+            },
+            {
+              key: "role",
+              label: "交易身份",
+              options: [
+                { value: "employer", label: "雇主" },
+                { value: "provider", label: "服务者" },
+              ],
+            },
+            { key: "start_date", label: "注册起始日", type: "date" },
+            { key: "end_date", label: "注册结束日", type: "date" },
+          ]}
           columns={[
             { key: "id", label: "用户 ID", render: (u) => u.id },
             {

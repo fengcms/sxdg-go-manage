@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { adminPath, useDetail } from "../api/admin";
 import { ResourceList } from "../components/data/ResourceList";
+import { TradeSummary } from "../components/data/TradeSummary";
 import { ActionDialog, type ActionSpec } from "../components/feedback/ActionDialog";
 import { Details } from "../components/feedback/Details";
 import { State } from "../components/feedback/State";
@@ -194,6 +195,7 @@ export default function Trade() {
               </Card>
             )}
           </State>
+          {result.data && <TradeSummary row={result.data} kind={kind} />}
         </>
       ) : (
         <ResourceList<Row>
@@ -205,6 +207,46 @@ export default function Trade() {
               : "查询业务记录，按合法状态执行受控操作"
           }
           filters={[
+            {
+              key: "keyword",
+              label:
+                kind === "orders"
+                  ? "订单号"
+                  : kind === "refunds"
+                    ? "退款号 / 订单号"
+                    : "标题关键词",
+            },
+            ...(["orders", "refunds"].includes(kind)
+              ? [
+                  { key: "start_date", label: "创建起始日", type: "date" },
+                  { key: "end_date", label: "创建结束日", type: "date" },
+                ]
+              : []),
+            ...(kind === "orders"
+              ? [
+                  {
+                    key: "delivery_type",
+                    label: "交付方式",
+                    options: [
+                      { value: "to_store", label: "到店" },
+                      { value: "offline", label: "线下" },
+                      { value: "online", label: "线上" },
+                    ],
+                  },
+                ]
+              : []),
+            ...(kind === "refunds"
+              ? [
+                  {
+                    key: "applicant_role",
+                    label: "申请方身份",
+                    options: [
+                      { value: "employer", label: "雇主" },
+                      { value: "provider", label: "服务者" },
+                    ],
+                  },
+                ]
+              : []),
             {
               key: "status",
               label: "状态",
