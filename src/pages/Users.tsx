@@ -29,6 +29,8 @@ export default function Users() {
           onClick={() =>
             setAction({
               title: u.banned ? "解封用户" : "封禁用户",
+              target: `${u.nickname || "用户"}（#${u.id}）`,
+              danger: !u.banned,
               path: adminPath(`users/${u.id}/status`),
               body: { banned: !u.banned },
               fields: [reason],
@@ -44,6 +46,7 @@ export default function Users() {
           onClick={() =>
             setAction({
               title: "调整信用分",
+              target: `${u.nickname || "用户"}（#${u.id}）· 当前信用分 ${u.creditScore}`,
               path: adminPath(`users/${u.id}/credit-score`),
               fields: [
                 {
@@ -88,6 +91,21 @@ export default function Users() {
           >
             {detail.data && (
               <Card>
+                <div className="profile-summary">
+                  <span className="avatar avatar-large" aria-hidden="true">
+                    {detail.data.nickname?.slice(0, 1) || "用"}
+                  </span>
+                  <div>
+                    <h2>{detail.data.nickname || "未设置昵称"}</h2>
+                    <p className="hint">
+                      用户 #{detail.data.id} · {text(detail.data.phoneMasked)}
+                    </p>
+                  </div>
+                  <Badge tone={detail.data.banned ? "danger" : "success"}>
+                    {detail.data.banned ? "已封禁" : "正常"}
+                  </Badge>
+                </div>
+                <h2 className="section-heading">基本资料</h2>
                 <Details
                   fields={[
                     ["用户 ID", detail.data.id],

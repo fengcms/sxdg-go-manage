@@ -22,11 +22,11 @@ export function UserResources({ id }: { id: number }) {
   const tab = Object.hasOwn(tabs, raw) ? raw : "credit-logs";
   return (
     <>
-      <section className="actions" aria-label="用户扩展资料">
+      <section className="resource-tabs" aria-label="用户扩展资料">
         {Object.entries(tabs).map(([key, label]) => (
           <Button
             key={key}
-            variant={tab === key ? "default" : "ghost"}
+            variant="ghost"
             aria-pressed={tab === key}
             onClick={() =>
               setParams(

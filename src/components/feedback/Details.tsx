@@ -6,7 +6,9 @@ export function Details({ fields }: { fields: [string, ReactNode][] }) {
       {fields.map(([name, value]) => (
         <div key={name}>
           <dt>{name}</dt>
-          <dd>{value}</dd>
+          <dd className={/金额|价格|服务费|余额/.test(name) ? "detail-amount" : undefined}>
+            {value}
+          </dd>
         </div>
       ))}
     </dl>

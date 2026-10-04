@@ -32,6 +32,8 @@ export interface FieldSpec {
 }
 export interface ActionSpec {
   title: string;
+  target?: string;
+  danger?: boolean;
   path: string;
   method?: string;
   description?: string;
@@ -45,6 +47,8 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
   const [confirm, setConfirm] = useState(false);
   const [discard, setDiscard] = useState(false);
   const fields = spec.fields || [];
+  const dangerous = spec.danger ?? /^(封禁|拒绝|删除|关闭|下架|取消)/.test(spec.title);
+  const wide = fields.some((f) => ["json", "multi", "image"].includes(f.type || ""));
   const shape: Record<string, z.ZodString> = {};
   for (const f of fields)
     shape[f.key] = f.required ? z.string().trim().min(1, "此项必填") : z.string();
@@ -82,8 +86,26 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
   };
   return (
     <>
-      <Modal title={confirm ? `确认${spec.title}` : spec.title} open onClose={close}>
-        <p className="notice">{spec.description || "请核对操作内容，成功后将记录管理操作日志。"}</p>
+      <Modal
+        title={confirm ? `确认${spec.title}` : spec.title}
+        size={wide ? "wide" : fields.length <= 1 ? "small" : "standard"}
+        open
+        onClose={close}
+      >
+        {spec.target && (
+          <div className="action-target">
+            <span className="hint">操作对象</span>
+            <strong>{spec.target}</strong>
+          </div>
+        )}
+        {spec.description && <p className="notice">{spec.description}</p>}
+        {confirm && (
+          <p className={dangerous ? "danger-notice" : "notice"}>
+            {dangerous
+              ? "请确认操作对象及影响，此操作会改变当前业务状态。"
+              : "请核对以下内容后执行，操作会记录审计日志。"}
+          </p>
+        )}
         <form
           onSubmit={handleSubmit(async (values) => {
             const invalid = spec.validate?.(values) || {};
@@ -158,7 +180,11 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
             >
               {confirm ? "返回修改" : "取消"}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              variant={dangerous && confirm ? "danger" : "default"}
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "处理中…" : confirm ? "确认执行" : "核对操作"}
             </Button>
           </div>
@@ -166,6 +192,7 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
       </Modal>
       <Modal
         title="离开并放弃修改？"
+        size="small"
         open={blocker.state === "blocked"}
         onClose={() => blocker.state === "blocked" && blocker.reset()}
       >
@@ -179,7 +206,12 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
           </Button>
         </div>
       </Modal>
-      <Modal title="放弃未保存的修改？" open={discard} onClose={() => setDiscard(false)}>
+      <Modal
+        size="small"
+        title="放弃未保存的修改？"
+        open={discard}
+        onClose={() => setDiscard(false)}
+      >
         <p>关闭后本次输入不会保存。</p>
         <div className="form-actions">
           <Button variant="ghost" onClick={() => setDiscard(false)}>

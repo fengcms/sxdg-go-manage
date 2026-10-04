@@ -36,6 +36,7 @@ export default function Trade() {
           variant="ghost"
           onClick={() =>
             setAction({
+              target: `${titles[kind]} #${r.orderNo || r.refundNo || r.id}`,
               title: op.title,
               path: adminPath(`${kind}/${r.id}/status`),
               fields: [reason],
@@ -53,6 +54,7 @@ export default function Trade() {
           <Button
             onClick={() =>
               setAction({
+                target: `${titles[kind]} #${r.orderNo || r.refundNo || r.id}`,
                 title: "通过退款裁定",
                 path: adminPath(`refunds/${r.id}/approve`),
                 method: "POST",
@@ -79,6 +81,7 @@ export default function Trade() {
             variant="danger"
             onClick={() =>
               setAction({
+                target: `${titles[kind]} #${r.orderNo || r.refundNo || r.id}`,
                 title: "拒绝退款裁定",
                 path: adminPath(`refunds/${r.id}/reject`),
                 method: "POST",
@@ -98,6 +101,7 @@ export default function Trade() {
             variant="ghost"
             onClick={() =>
               setAction({
+                target: `${titles[kind]} #${r.orderNo || r.refundNo || r.id}`,
                 title: r.status === 2 ? "下架服务" : "恢复发布",
                 path: adminPath(`services/${r.id}/status`),
                 body: { status: r.status === 2 ? 3 : 2 },
@@ -112,6 +116,7 @@ export default function Trade() {
             variant="danger"
             onClick={() =>
               setAction({
+                target: `${titles[kind]} #${r.orderNo || r.refundNo || r.id}`,
                 title: r.status === 0 ? "删除草稿" : "关闭需求",
                 path: adminPath(`${kind}/${r.id}`),
                 method: "DELETE",
@@ -147,11 +152,26 @@ export default function Trade() {
           >
             {result.data && (
               <Card>
+                <div className="trade-summary-header">
+                  <div>
+                    <span className="hint">
+                      {kind === "orders"
+                        ? "订单编号"
+                        : kind === "refunds"
+                          ? "退款编号"
+                          : "内容编号"}
+                    </span>
+                    <h2>{result.data.orderNo || result.data.refundNo || `#${result.data.id}`}</h2>
+                  </div>
+                  <Badge tone={result.data.status === 0 ? "warning" : "info"}>
+                    {status(result.data)}
+                  </Badge>
+                </div>
+                <h2 className="section-heading">基本信息与履约记录</h2>
                 <Details
                   fields={[
                     ["编号", result.data.orderNo || result.data.refundNo || result.data.id],
                     ["标题", text(result.data.title)],
-                    ["状态", status(result.data)],
                     ["创建时间", dateText(result.data.createdAt)],
                     ...(kind === "orders"
                       ? ([

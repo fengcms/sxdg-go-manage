@@ -22,10 +22,7 @@ export function Modal({
     <Dialog.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="overlay" />
-        <Dialog.Content
-          className={`modal modal-${size}`}
-          aria-describedby={description ? undefined : undefined}
-        >
+        <Dialog.Content className={`modal modal-${size}`} aria-describedby={undefined}>
           <div className="modal-heading">
             <div>
               <Dialog.Title>{title}</Dialog.Title>

@@ -974,3 +974,67 @@ pre {
     animation: none;
   }
 }
+/* 详情摘要与分组：标识、状态、金额先于辅助字段。 */
+.profile-summary,
+.trade-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.profile-summary h2,
+.trade-summary-header h2 {
+  margin: 0;
+}
+.profile-summary .badge,
+.trade-summary-header .badge {
+  margin-left: auto;
+}
+.avatar-large {
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.section-heading {
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+.detail-amount {
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.action-target {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  margin-bottom: 20px;
+  background: var(--muted);
+  border-radius: 8px;
+}
+.danger-notice {
+  color: var(--danger);
+  padding: 12px;
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+.resource-tabs {
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid var(--border);
+  margin: 24px 0 20px;
+}
+.resource-tabs .button {
+  border-radius: 0;
+  height: 42px;
+  border-bottom: 2px solid transparent;
+}
+.resource-tabs .button[aria-pressed="true"] {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
