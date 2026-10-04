@@ -51,12 +51,18 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
     register,
     handleSubmit,
     getValues,
+    watch,
+    setValue,
     setError,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<Record<string, string>>({
     resolver: zodResolver(z.object(shape)),
     defaultValues: Object.fromEntries(fields.map((f) => [f.key, f.default ?? ""])),
   });
+  const payer = watch("payer");
+  useEffect(() => {
+    if (payer && payer !== "split") setValue("percent", "");
+  }, [payer, setValue]);
   useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -128,7 +134,12 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
                 description={f.description}
                 error={errors[f.key]?.message}
               >
-                <ActionInput field={f} register={register} />
+                <ActionInput
+                  field={{ ...f, default: getValues(f.key) }}
+                  register={register}
+                  setValue={setValue}
+                  disabled={f.key === "percent" && payer !== "split"}
+                />
               </FormField>
             ))
           )}
@@ -168,14 +179,18 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
 function ActionInput({
   field: f,
   register,
+  setValue,
+  disabled,
 }: {
   field: FieldSpec;
   register: ReturnType<typeof useForm<Record<string, string>>>["register"];
+  setValue: ReturnType<typeof useForm<Record<string, string>>>["setValue"];
+  disabled: boolean;
 }) {
   const [current, setCurrent] = useState(f.default || "");
   const update = (value: string) => {
     setCurrent(value);
-    void register(f.key).onChange({ target: { name: f.key, value } });
+    setValue(f.key, value, { shouldDirty: true, shouldValidate: true });
   };
   if (f.type === "image")
     return (
@@ -219,7 +234,7 @@ function ActionInput({
         <TemplatePreview raw={current} />
       </>
     );
-  const props = { id: `action-${f.key}`, ...register(f.key) };
+  const props = { id: `action-${f.key}`, ...register(f.key), disabled };
   if (f.type === "textarea") return <Textarea {...props} />;
   if (f.type === "select")
     return (

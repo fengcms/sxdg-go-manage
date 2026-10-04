@@ -17,6 +17,7 @@ const Qualifications = lazy(() => import("../pages/Qualifications"));
 const Content = lazy(() => import("../pages/Content"));
 const Trade = lazy(() => import("../pages/Trade"));
 const Customer = lazy(() => import("../pages/Customer"));
+const System = lazy(() => import("../pages/System"));
 const Login = lazy(() => import("../pages/Login"));
 const Layout = lazy(() => import("../layouts/AdminLayout"));
 function Guard() {
@@ -31,8 +32,8 @@ function Guard() {
 function Placeholder() {
   return (
     <section className="card">
-      <h1>工作台已就绪</h1>
-      <p>业务模块将按开发阶段接入真实后端。</p>
+      <h1>404 · 页面不存在</h1>
+      <p>请从左侧导航选择功能页面。</p>
     </section>
   );
 }
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
           ]),
           { path: "/cs/agents", element: <Customer /> },
           { path: "/cs/sessions", element: <Customer /> },
+          { path: "/system/:kind", element: <System /> },
           { path: "*", element: <Placeholder /> },
         ],
       },
