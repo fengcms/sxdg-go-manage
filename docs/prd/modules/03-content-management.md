@@ -132,7 +132,7 @@
 
 ### 3.3 模板编辑器（真实 DSL）
 
-采用后端真实 DSL（与小程序共用同一结构与校验规则）。**首期：JSON 编辑器 + 校验 + 预览**；可视化拖拽设计器为**二期**（工作量单列）。
+采用后端真实 DSL（与小程序共用同一结构与校验规则）。**首期：JSON 编辑器 + 校验 + 预览**；可视化结构化编辑器方案已设计完成，见 [03a-form-designer.md](./03a-form-designer.md)（结构树 + 属性面板 + 实时预览，JSON 降级为专家模式；实施排期待确认）。
 
 **模板结构**：`blocks: [{ blockId, fields: [{ key, label, type, required, options, maxCustom, panel }] }]`
 

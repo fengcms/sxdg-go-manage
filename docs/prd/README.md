@@ -31,6 +31,7 @@
 | [modules/01-dashboard.md](./modules/01-dashboard.md) | 数据看板：运营总览、订单统计、用户统计、财务统计 |
 | [modules/02-user-management.md](./modules/02-user-management.md) | 用户管理：用户列表/详情、封禁解封、信用分调整、资质审核 |
 | [modules/03-content-management.md](./modules/03-content-management.md) | 内容管理：分类体系、热门分类、动态表单模板、Banner、服务标签 |
+| [modules/03a-form-designer.md](./modules/03a-form-designer.md) | 动态表单模板设计器方案（结构树 + 属性面板 + 预览，模块三 §3.3 实施级） |
 | [modules/04-order-refund.md](./modules/04-order-refund.md) | 订单与退款：订单列表/详情、手动改状态、退款审核、服务/需求管理 |
 | [modules/05-customer-service.md](./modules/05-customer-service.md) | 客服管理：客服账号、接待工作台、会话流转 |
 | [modules/06-system-config.md](./modules/06-system-config.md) | 系统配置：系统参数、信用分规则、服务费配置 |
