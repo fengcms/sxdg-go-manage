@@ -95,8 +95,11 @@ for (const role of Object.keys(accounts)) {
       });
       await expect(page.getByText("403 · 无访问权限")).toBeVisible();
     }
+    const route = page.url();
     await page.reload();
-    await expect(page.getByRole("button", { name: "登录工作台", exact: true })).toBeVisible();
+    await expect(page.locator(".topbar")).toBeVisible();
+    await expect(page).toHaveURL(route);
+    await expect(page.getByRole("button", { name: "登录工作台", exact: true })).toHaveCount(0);
   });
 }
 test("登录错误不刷新，移动端菜单可达", async ({ page }) => {

@@ -215,7 +215,7 @@ export default function AdminLayout() {
               <div className="account-popover">
                 <strong>{user?.nickname}</strong>
                 <p className="hint">{roles[user?.adminRole as keyof typeof roles] || "未知角色"}</p>
-                <p className="hint">刷新页面需要重新登录</p>
+                <p className="hint">刷新页面自动恢复登录</p>
               </div>
             </details>
 

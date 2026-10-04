@@ -13,7 +13,7 @@ React 19 + TypeScript + Vite + Tailwind CSS v4。中文界面，对接同级 `sx
 
 账号初始化在后端使用 `ADMIN_USERNAME`、`ADMIN_PASSWORD`、`ADMIN_ROLE` 环境变量执行 `go run ./cmd/init-admin`；角色为 super_admin/operator/finance/customer_service。不把密码写进 Git；客服账号还需由超管在“客服配置”中绑定接待身份。
 
-双令牌只保存在内存，**刷新页面或新标签页需要重新登录**。不是登录状态丢失缺陷。查询条件写入 URL，登录后回到原路由。
+登录会话保存在当前标签页的 `sessionStorage`，**刷新页面自动恢复登录**，保留原路由和 URL 查询条件。恢复时先向后端校验身份；访问令牌过期自动续期，刷新令牌失效或权限被撤销才回到登录页。网络暂时失败可重试。主动退出清除保存的令牌和业务缓存，不保存密码或角色信息。独立标签页不共享登录；浏览器禁用会话存储时退回内存模式。具体行为见 [会话恢复决策](docs/prd/review/09-session-restoration-decision.md)。
 
 ## 验证
 
@@ -57,4 +57,4 @@ pnpm exec playwright test
 
 ## 参考风格整改
 
-已对齐蓝灰明暗主题、紧凑工作台与统一页面组件。右上角切换主题，桌面左上角折叠导航；主题和侧栏偏好独立保存，不保存令牌。整改前后截图、阶段提交与验证记录见 [UI 整改验收](docs/dev-log/ui-remediation-acceptance.md)，决策过程见 [UI 流水账](docs/dev-log/ui-remediation.md)。
+已对齐蓝灰明暗主题、紧凑工作台与统一页面组件。右上角切换主题，桌面左上角折叠导航；主题和侧栏偏好独立保存，登录令牌使用标签页会话存储。整改前后截图、阶段提交与验证记录见 [UI 整改验收](docs/dev-log/ui-remediation-acceptance.md)，决策过程见 [UI 流水账](docs/dev-log/ui-remediation.md)。

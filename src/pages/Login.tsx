@@ -78,7 +78,7 @@ export default function Login() {
             {isSubmitting ? "正在登录…" : "登录工作台"}
           </Button>
         </form>
-        <p className="hint">为保护管理数据，刷新页面后需要重新登录。</p>
+        <p className="hint">当前标签页内保持登录；使用结束后请主动退出。</p>
       </section>
     </div>
   );

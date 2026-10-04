@@ -8,7 +8,9 @@
       "*.json",
       "*.ts",
       "index.html",
-      "!src/types/api.gen.ts"
+      "!src/types/api.gen.ts",
+      "!.e2e-accounts.json",
+      "!.e2e-fixtures.json"
     ],
     "ignoreUnknown": true
   },

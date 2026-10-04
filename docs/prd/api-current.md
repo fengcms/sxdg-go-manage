@@ -4,7 +4,7 @@
 
 | 页面域 | 接口与变化 | 角色及验收重点 |
 |---|---|---|
-| 登录 | auth/login、refresh、logout、me；me 已有 isAdmin/adminRole | 四角色；纯内存、轮换与换用户隔离 |
+| 登录 | auth/login、refresh、logout、me；me 已有 isAdmin/adminRole | 四角色；标签页会话恢复、轮换与换用户隔离（见 review/09-session-restoration-decision.md） |
 | 看板 | dashboard 四接口仍数组；三入口有效登录更新 last_login_at | 财务仅 finance/超管；近24h不是自然日 |
 | 用户 | users 列表/详情有 banned/banReason/bannedAt；封禁显式布尔及原因 | 封禁客服/超管，调分仅超管；未知态禁用 |
 | 资质 | GET admin/qualifications 全局分页，status 数字0/1/2与user摘要 | operator/超管；证件鉴权 Blob |

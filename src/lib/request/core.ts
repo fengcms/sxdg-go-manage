@@ -44,7 +44,12 @@ async function refresh(epoch: number) {
       if (useAuth.getState().epoch !== epoch) throw new ApiError("会话已切换", 401);
       useAuth.getState().rotate(tokens);
     } catch (e) {
-      if (useAuth.getState().epoch === epoch) clearSession();
+      if (
+        useAuth.getState().epoch === epoch &&
+        e instanceof ApiError &&
+        [401, 403].includes(e.status)
+      )
+        clearSession();
       throw e;
     } finally {
       if (flight?.epoch === epoch) flight = null;
