@@ -23,6 +23,7 @@ export const usePreferences = create<{
   collapsed: boolean;
   toggleTheme: () => void;
   toggleSidebar: () => void;
+  collapseSidebar: () => void;
 }>((set) => ({
   theme: initialTheme,
   collapsed: saved("collapsed") === "true",
@@ -33,6 +34,7 @@ export const usePreferences = create<{
       persist("theme", theme);
       return { theme };
     }),
+  collapseSidebar: () => set({ collapsed: true }),
   toggleSidebar: () =>
     set((s) => {
       persist("collapsed", String(!s.collapsed));

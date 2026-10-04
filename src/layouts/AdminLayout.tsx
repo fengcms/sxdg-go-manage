@@ -69,6 +69,46 @@ export default function AdminLayout() {
   const { theme, collapsed, toggleTheme, toggleSidebar } = usePreferences();
   const user = useAuth((s) => s.user);
   const [open, setOpen] = useState(false);
+  const [mobile, setMobile] = useState(() => window.innerWidth < 1024);
+  useEffect(() => {
+    const compact = window.matchMedia("(min-width: 1024px) and (max-width: 1279px)");
+    const compactUpdate = () => {
+      if (compact.matches) usePreferences.getState().collapseSidebar();
+    };
+    compactUpdate();
+    compact.addEventListener("change", compactUpdate);
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => {
+      setMobile(mq.matches);
+      if (!mq.matches) setOpen(false);
+    };
+    mq.addEventListener("change", update);
+    return () => {
+      mq.removeEventListener("change", update);
+      compact.removeEventListener("change", compactUpdate);
+    };
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>(".sidebar a"));
+    links[0]?.focus();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+      if (e.key !== "Tab") return;
+      if (e.shiftKey && document.activeElement === links[0]) {
+        e.preventDefault();
+        links.at(-1)?.focus();
+      } else if (!e.shiftKey && document.activeElement === links.at(-1)) {
+        e.preventDefault();
+        links[0]?.focus();
+      }
+    };
+    document.addEventListener("keydown", key);
+    return () => {
+      document.removeEventListener("keydown", key);
+      document.querySelector<HTMLButtonElement>(".menu-button")?.focus();
+    };
+  }, [open]);
   const [busy, setBusy] = useState(false);
   const location = useLocation();
   const me = useQuery({
@@ -103,7 +143,7 @@ export default function AdminLayout() {
           onClick={() => setOpen(false)}
         />
       )}
-      <aside className={`sidebar ${open ? "sidebar-open" : ""}`}>
+      <aside className={`sidebar ${open ? "sidebar-open" : ""}`} inert={mobile && !open}>
         <NavLink className="logo" to="/dashboard/overview">
           <Layers />
           <span>
@@ -137,7 +177,7 @@ export default function AdminLayout() {
         </nav>
         <div className="sidebar-footer">{import.meta.env.DEV ? "开发环境" : "管理控制台"}</div>
       </aside>
-      <div className="main-shell">
+      <div className="main-shell" inert={mobile && open}>
         <header className="topbar">
           <div className="actions">
             <Button

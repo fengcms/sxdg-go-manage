@@ -273,15 +273,16 @@ function ActionInput({
     );
   if (f.type === "json")
     return (
-      <>
+      <div className="template-editor-grid">
         <Textarea
+          className="code-editor"
           id={`action-${f.key}`}
           rows={12}
           value={current}
           onChange={(e) => update(e.target.value)}
         />
         <TemplatePreview raw={current} />
-      </>
+      </div>
     );
   const props = { id: `action-${f.key}`, ...register(f.key), disabled };
   if (f.type === "textarea") return <Textarea {...props} />;

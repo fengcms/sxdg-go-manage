@@ -1,0 +1,7 @@
+/* 隐藏动态内容而保留几何布局；真实业务文字仍由行为用例验证。 */
+.table-scroll tbody,
+.table-scroll tbody *,
+.pagination-total,
+.action-target strong {
+  visibility: hidden;
+}

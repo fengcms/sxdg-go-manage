@@ -322,6 +322,8 @@ export default function Content() {
                   onClick={() =>
                     setAction({
                       title: kind === "featured-categories" ? "删除热门入口" : "停用 / 删除",
+                      danger: true,
+                      target: `${r.name || r.templateName || r.title || "记录"}（#${r.id}）`,
                       path: adminPath(`${kind}/${r.id}`),
                       method: "DELETE",
                       description:

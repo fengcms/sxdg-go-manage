@@ -54,3 +54,7 @@ pnpm exec playwright test
 - `docs/prd/api-current.md`：后端最新交付与旧 PRD 的差异。
 - `docs/dev-log/2026-10-04.md`：开发流水账。
 - `docs/dev-log/acceptance.md`：验证结果与边界。
+
+## 参考风格整改
+
+已对齐蓝灰明暗主题、紧凑工作台与统一页面组件。右上角切换主题，桌面左上角折叠导航；主题和侧栏偏好独立保存，不保存令牌。整改前后截图、阶段提交与验证记录见 [UI 整改验收](docs/dev-log/ui-remediation-acceptance.md)，决策过程见 [UI 流水账](docs/dev-log/ui-remediation.md)。

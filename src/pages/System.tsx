@@ -160,7 +160,19 @@ function ConfigRules({ rules }: { rules: boolean }) {
           description="配置逐项更新，不重算已写入业务记录的截止时间"
           columns={[
             { key: "key", label: "配置键", render: (r) => r.configKey },
-            { key: "desc", label: "说明", render: (r) => text(r.description) },
+            {
+              key: "desc",
+              label: "用途与生效范围",
+              wrap: true,
+              render: (r) => (
+                <div className="config-purpose">
+                  <strong>{text(r.description)}</strong>
+                  <span className="hint">
+                    {configNotes[r.configKey] || "影响后续读取此配置的业务"}
+                  </span>
+                </div>
+              ),
+            },
             { key: "value", label: "当前值", render: (r) => r.configValue },
             { key: "time", label: "更新时间", render: (r) => dateText(r.updatedAt) },
             {

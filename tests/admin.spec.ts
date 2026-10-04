@@ -182,14 +182,14 @@ test("空态、网络错误恢复与未保存离开确认", async ({ page, conte
   await page.locator("nav").getByRole("link", { name: "用户管理", exact: true }).click();
   await page.getByLabel("昵称 / 完整手机号", { exact: true }).fill("不存在的用户-" + Date.now());
   await page.getByRole("button", { name: "查询", exact: true }).click();
-  await expect(page.getByText("暂无数据", { exact: true })).toBeVisible();
+  await expect(page.getByText("没有符合条件的记录", { exact: true })).toBeVisible();
   await context.setOffline(true);
   await page.getByLabel("昵称 / 完整手机号", { exact: true }).fill("offline-" + Date.now());
   await page.getByRole("button", { name: "查询", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("网络连接失败");
   await context.setOffline(false);
   await page.getByRole("button", { name: "重试", exact: true }).click();
-  await expect(page.getByText("暂无数据", { exact: true })).toBeVisible();
+  await expect(page.getByText("没有符合条件的记录", { exact: true })).toBeVisible();
   await page.locator("nav").getByRole("link", { name: "服务标签", exact: true }).click();
   await page.getByRole("button", { name: "新建服务标签" }).click();
   await page.getByLabel("名称", { exact: true }).fill("未保存的标签");

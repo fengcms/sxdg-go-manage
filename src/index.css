@@ -537,7 +537,7 @@ pre {
   font-size: 13px;
   border-radius: 7px;
 }
-.nav-group a svg {
+.nav-group a :where(svg) {
   flex-shrink: 0;
 }
 .nav-group a:hover {
@@ -608,8 +608,8 @@ pre {
 .is-collapsed .sidebar {
   width: 64px;
 }
-.is-collapsed .sidebar span,
-.is-collapsed .sidebar p,
+.is-collapsed :where(.sidebar) span,
+.is-collapsed :where(.sidebar) p,
 .is-collapsed .sidebar-footer {
   display: none;
 }
@@ -724,26 +724,9 @@ pre {
   text-align: left;
   margin-bottom: 8px;
 }
-.login-panel form > .button {
+.login-panel :where(form) > .button {
   width: 100%;
   margin-bottom: 16px;
-}
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .sidebar {
-    width: 64px;
-  }
-  .sidebar span,
-  .sidebar p,
-  .sidebar-footer {
-    display: none;
-  }
-  .logo {
-    padding: 0 20px;
-  }
-  .nav-group a {
-    justify-content: center;
-    padding: 0;
-  }
 }
 @media (max-width: 1023px) {
   .sidebar {
@@ -758,8 +741,8 @@ pre {
   .is-collapsed .sidebar {
     width: 220px;
   }
-  .is-collapsed .sidebar span,
-  .is-collapsed .sidebar p,
+  .is-collapsed :where(.sidebar) span,
+  .is-collapsed :where(.sidebar) p,
   .is-collapsed .sidebar-footer {
     display: block;
   }
@@ -823,8 +806,7 @@ pre {
     align-items: flex-start;
     flex-direction: column;
   }
-  .account-name,
-  .topbar .avatar {
+  .account-name {
     display: none;
   }
   .filters .form-field {
@@ -1130,4 +1112,43 @@ pre {
   box-shadow: var(--e2);
   padding: 16px;
   z-index: 35;
+}
+
+/* 行内操作不折成多行，窄屏由表格局部横滚承接。 */
+.table-scroll .actions {
+  flex-wrap: nowrap;
+}
+
+.config-purpose {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.template-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.template-editor-grid .template-preview {
+  margin-top: 0;
+  max-height: 440px;
+  overflow-y: auto;
+}
+.code-editor {
+  font-family: ui-monospace, monospace;
+  min-height: 320px;
+}
+.template-preview .form-field {
+  display: block;
+}
+.template-preview .form-field > label {
+  display: block;
+  text-align: left;
+  margin-bottom: 6px;
+}
+@media (max-width: 640px) {
+  .template-editor-grid {
+    grid-template-columns: 1fr;
+  }
 }
