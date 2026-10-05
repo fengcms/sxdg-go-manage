@@ -10,7 +10,9 @@
       "index.html",
       "!src/types/api.gen.ts",
       "!.e2e-accounts.json",
-      "!.e2e-fixtures.json"
+      "!.e2e-fixtures.json",
+      "!.refund-e2e.json",
+      "!.refund-e2e-accounts.json"
     ],
     "ignoreUnknown": true
   },

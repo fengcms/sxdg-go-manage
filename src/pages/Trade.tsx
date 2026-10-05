@@ -148,7 +148,9 @@ export default function Trade() {
             </div>
             <div className="actions">
               {result.data && buttons(result.data)}
-              {kind === "refunds" && result.data && <RefundChannelActions row={result.data} />}
+              {kind === "refunds" && result.data && (
+                <RefundChannelActions key={result.data.id} row={result.data} />
+              )}
             </div>
           </div>
           <State

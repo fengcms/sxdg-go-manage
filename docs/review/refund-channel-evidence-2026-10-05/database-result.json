@@ -1,0 +1,85 @@
+[
+  {
+    "id": 10,
+    "refundNo": "RCffc6b5a82babnormal",
+    "status": 6,
+    "channelStatus": "ABNORMAL",
+    "retryCount": 0,
+    "requirementId": 8,
+    "requirementRefundedAmount": "0.00",
+    "attempts": [
+      {
+        "refundNo": "RCffc6b5a82babnormal",
+        "channelStatus": "ABNORMAL"
+      }
+    ],
+    "auditCounts": null
+  },
+  {
+    "id": 11,
+    "refundNo": "RCffc6b5a82bprocessing",
+    "status": 1,
+    "channelStatus": "PROCESSING",
+    "retryCount": 0,
+    "requirementId": 9,
+    "requirementRefundedAmount": "0.00",
+    "attempts": [
+      {
+        "refundNo": "RCffc6b5a82bprocessing",
+        "channelStatus": "PROCESSING"
+      }
+    ],
+    "auditCounts": [
+      {
+        "action": "reconcile",
+        "count": 3
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "refundNo": "RCffc6b5a82bsuccess",
+    "status": 4,
+    "channelStatus": "SUCCESS",
+    "retryCount": 0,
+    "requirementId": 10,
+    "requirementRefundedAmount": "50.00",
+    "attempts": [
+      {
+        "refundNo": "RCffc6b5a82bsuccess",
+        "channelStatus": "SUCCESS"
+      }
+    ],
+    "auditCounts": [
+      {
+        "action": "reconcile",
+        "count": 4
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "refundNo": "REF_2d017e27df074682833fca59be1f",
+    "status": 4,
+    "channelStatus": "SUCCESS",
+    "retryCount": 1,
+    "requirementId": 7,
+    "requirementRefundedAmount": "50.00",
+    "attempts": [
+      {
+        "refundNo": "RCffc6b5a82bclosed",
+        "channelStatus": "CLOSED"
+      },
+      {
+        "refundNo": "REF_2d017e27df074682833fca59be1f",
+        "channelStatus": "SUCCESS"
+      }
+    ],
+    "auditCounts": [
+      {
+        "action": "retry",
+        "count": 1
+      }
+    ]
+  }
+]

@@ -1,0 +1,93 @@
+{
+  "run": "RCffc6b5a82b",
+  "stats": {
+    "startTime": "2026-10-05T15:03:58.372Z",
+    "duration": 15026.17,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "title": "finance真实查单与已完成重复查单",
+      "ok": true,
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2718
+        }
+      ]
+    },
+    {
+      "title": "super_admin真实查单与已完成重复查单",
+      "ok": true,
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2726
+        }
+      ]
+    },
+    {
+      "title": "财务CLOSED换号、历史通知隔离与SUCCESS幂等",
+      "ok": true,
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1871
+        }
+      ]
+    },
+    {
+      "title": "ABNORMAL不可重试，客服只读，运营403及真实越权拒绝",
+      "ok": true,
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1470
+        }
+      ]
+    },
+    {
+      "title": "原因长度、70002保留输入、网络异常不自动重发",
+      "ok": true,
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1523
+        }
+      ]
+    },
+    {
+      "title": "空历史与未知通道回退",
+      "ok": true,
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1096
+        }
+      ]
+    },
+    {
+      "title": "255个Unicode字符可提交且执行中禁重复点击",
+      "ok": true,
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1311
+        }
+      ]
+    },
+    {
+      "title": "状态6筛选与空通道不误报",
+      "ok": true,
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1654
+        }
+      ]
+    }
+  ]
+}
