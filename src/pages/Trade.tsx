@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { adminPath, useDetail } from "../api/admin";
 import { RefundChannel } from "../components/data/RefundChannel";
+import { RefundChannelActions } from "../components/data/RefundChannelActions";
 import { ResourceList } from "../components/data/ResourceList";
 import { TradeSummary } from "../components/data/TradeSummary";
 import { ActionDialog, type ActionSpec } from "../components/feedback/ActionDialog";
@@ -145,7 +146,10 @@ export default function Trade() {
               <h1>{titles[kind]} · 详情</h1>
               <Link to={`/${kind}`}>返回列表</Link>
             </div>
-            {result.data && buttons(result.data)}
+            <div className="actions">
+              {result.data && buttons(result.data)}
+              {kind === "refunds" && result.data && <RefundChannelActions row={result.data} />}
+            </div>
           </div>
           <State
             loading={result.isLoading}

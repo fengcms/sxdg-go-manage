@@ -52,7 +52,7 @@ export function channelText(channel?: string | null) {
   return channel ? labels[channel] || channel : "暂无通道记录";
 }
 // refundReasonError 按Unicode字符计数，与后端rune校验保持一致。
-export function refundReasonError(reason: string) {
+export function refundReasonError(reason: string): Record<string, string> {
   const size = Array.from(reason.trim()).length;
   return size >= 1 && size <= 255 ? {} : { reason: "请填写1～255个字符的操作原因" };
 }

@@ -42,6 +42,9 @@ export interface ActionSpec {
   validate?: (values: Record<string, string>) => Record<string, string>;
   build?: (values: Record<string, string>) => Record<string, unknown>;
   after?: () => void;
+  successMessage?: string;
+  onResult?: (result: unknown) => void;
+  onFailure?: (error: unknown) => Promise<void>;
 }
 export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () => void }) {
   const [confirm, setConfirm] = useState(false);
@@ -116,7 +119,7 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
               return;
             }
             try {
-              await request(spec.path, {
+              const result = await request(spec.path, {
                 method: spec.method || "PUT",
                 body:
                   spec.method === "DELETE"
@@ -126,10 +129,12 @@ export function ActionDialog({ spec, onClose }: { spec: ActionSpec; onClose: () 
                       : { ...spec.body, ...values },
               });
               await queryClient.invalidateQueries({ queryKey: ["resource"] });
-              toast.success("操作成功");
+              toast.success(spec.successMessage || "操作成功");
+              spec.onResult?.(result);
               spec.after?.();
               onClose();
             } catch (e) {
+              await spec.onFailure?.(e);
               setError("root", { message: e instanceof Error ? e.message : "操作失败" });
               setConfirm(false);
             }

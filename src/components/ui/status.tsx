@@ -18,7 +18,8 @@ export function statusTone(label: string): Tone {
     )
   )
     return "success";
-  if (["已封禁", "已拒绝", "退款被拒", "结算失败"].includes(label)) return "danger";
+  if (["已封禁", "已拒绝", "退款被拒", "结算失败", "通道失败待处理"].includes(label))
+    return "danger";
   if (["待审核", "待支付", "待验收", "处理中", "平台审核中", "退款中", "待结算"].includes(label))
     return "warning";
   if (["进行中", "已预约"].includes(label)) return "info";
