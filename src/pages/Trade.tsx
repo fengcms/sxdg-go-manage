@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { adminPath, useDetail } from "../api/admin";
+import { RefundChannel } from "../components/data/RefundChannel";
 import { ResourceList } from "../components/data/ResourceList";
 import { TradeSummary } from "../components/data/TradeSummary";
 import { ActionDialog, type ActionSpec } from "../components/feedback/ActionDialog";
@@ -214,6 +215,7 @@ export default function Trade() {
               </Card>
             )}
           </State>
+          {kind === "refunds" && result.data && <RefundChannel row={result.data} />}
           {result.data && <TradeSummary row={result.data} kind={kind} />}
         </>
       ) : (

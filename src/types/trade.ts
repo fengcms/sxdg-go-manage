@@ -1,6 +1,17 @@
 // 交易详情安全展示所需字段；聚合仅存在于详情，列表不假设摘要存在。
 import type { Summary } from "./user";
+export interface RefundAttempt {
+  id: number;
+  refundId: number;
+  refundNo: string;
+  channelStatus: string;
+  createdAt: string;
+}
 export interface Trade {
+  channelStatus?: string | null;
+  retryCount?: number;
+  lastRetryAt?: string | null;
+  attempts?: RefundAttempt[];
   id: number;
   status: number;
   createdAt: string;

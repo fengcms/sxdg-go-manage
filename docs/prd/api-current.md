@@ -17,3 +17,10 @@
 增强批次的字段精确契约见 [后端 API §18](../../../sxdg-be/docs/api-spec.md)：用户keyword昵称或完整手机号、role=employer/provider；订单keyword及delivery_type；退款keyword及applicant_role；用户/订单/退款/审计start_date/end_date按上海半开区间；审计admin_id/action/target_type；服务/需求keyword标题。用户详情phoneMasked/completedOrders，子资源credit-logs/services/requirements。订单详情employer/provider/settlement/refunds；退款source。订单列表仍ID展示。
 
 OpenAPI现有80条admin、总计183接口，不全数映射首期页面。IM发送和看板升级仍未实现。无新表迁移。
+
+## 2026-10-05 退款通道接入
+
+POST `/api/v1/admin/refunds/:id/reconcile`：finance/super_admin，status=1/4/6。
+POST `/api/v1/admin/refunds/:id/retry`：finance/super_admin，status=6且channelStatus=CLOSED。
+均提交`{reason}`（trim后1～255 Unicode字符），返回Refund；随后GET详情获取attempts聚合。
+详情增加channelStatus、retryCount、lastRetryAt、attempts[{id,refundId,refundNo,channelStatus,createdAt}]。status=6表示通道失败待处理。未知通道原值回退，null不冒充处理中。
