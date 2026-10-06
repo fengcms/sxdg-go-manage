@@ -74,7 +74,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+], { basename: "/admin" });
 export function Router() {
   return (
     <Suspense fallback={<div className="state">正在载入工作台…</div>}>
